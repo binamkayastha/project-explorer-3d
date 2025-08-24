@@ -66,31 +66,39 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
   const isRecent = project.launch_year >= 2023;
 
   useFrame((state) => {
-    if (meshRef.current && (isRecent || isHighlighted)) {
-      const material = meshRef.current.material as THREE.MeshStandardMaterial;
-      if (material) {
-        material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 2) * 0.2;
+    if (meshRef.current) {
+      // Gentle floating animation
+      meshRef.current.position.y = (project.y || 0) + Math.sin(state.clock.elapsedTime + (project.x || 0)) * 0.1;
+      
+      // Pulsing for recent projects or highlighted ones
+      if (isRecent || isHighlighted) {
+        const material = meshRef.current.material as THREE.MeshStandardMaterial;
+        if (material) {
+          material.emissiveIntensity = 0.2 + Math.sin(state.clock.elapsedTime * 3) * 0.15;
+        }
       }
     }
   });
 
   const scale = useMemo(() => {
-    if (isSelected) return 2.5;
-    if (isHighlighted) return 2;
-    if (hovered) return 1.5;
-    return 1;
+    if (isSelected) return 3;
+    if (isHighlighted) return 2.2;
+    if (hovered) return 1.8;
+    return 1.2;
   }, [isSelected, isHighlighted, hovered]);
 
-  // Use project coordinates with fallbacks
+  // Ensure we have valid coordinates with better fallbacks
   const position: [number, number, number] = [
-    project.x || 0,
-    project.y || 0,
-    project.z || 0
+    (project.x !== undefined && !isNaN(project.x)) ? project.x : Math.random() * 20 - 10,
+    (project.y !== undefined && !isNaN(project.y)) ? project.y : Math.random() * 20 - 10,
+    (project.z !== undefined && !isNaN(project.z)) ? project.z : Math.random() * 20 - 10
   ];
+
+  console.log(`Project "${project.title}" position:`, position);
 
   // Render different geometries based on category
   const renderGeometry = () => {
-    const baseSize = 0.3;
+    const baseSize = 0.5; // Increased base size for better visibility
     switch (shape) {
       case 'box':
         return <boxGeometry args={[baseSize, baseSize, baseSize]} />;
@@ -108,6 +116,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
       onClick={(e) => {
         e.stopPropagation();
         onClick(project);
+        console.log('Clicked project:', project.title);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -124,16 +133,29 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
         <meshStandardMaterial
           color={color}
           transparent={true}
-          opacity={isRecent ? 0.9 : 0.7}
+          opacity={0.9}
           emissive={isHighlighted ? color : '#000000'}
-          emissiveIntensity={isHighlighted ? 0.3 : 0}
-          roughness={0.4}
-          metalness={0.1}
+          emissiveIntensity={isHighlighted ? 0.3 : 0.1}
+          roughness={0.3}
+          metalness={0.2}
         />
       </mesh>
       
+      {/* Glowing outline for selected projects */}
       {isSelected && (
-        <Html distanceFactor={8}>
+        <mesh scale={1.1}>
+          {renderGeometry()}
+          <meshBasicMaterial
+            color={color}
+            transparent={true}
+            opacity={0.3}
+            side={THREE.BackSide}
+          />
+        </mesh>
+      )}
+      
+      {isSelected && (
+        <Html distanceFactor={6} position={[0, 1, 0]}>
           <div className="animate-scale-in">
             <ProjectCard project={project} />
           </div>
@@ -141,11 +163,13 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
       )}
       
       {hovered && !isSelected && (
-        <Html distanceFactor={12}>
-          <div className="cosmic-tooltip animate-fade-in max-w-xs">
-            <div className="font-medium truncate">{project.title}</div>
-            <div className="text-xs opacity-80">{project.category_label}</div>
-            <div className="text-xs opacity-60 mt-1 line-clamp-2">{project.description}</div>
+        <Html distanceFactor={8} position={[0, 0.8, 0]}>
+          <div className="cosmic-tooltip animate-fade-in max-w-xs pointer-events-none">
+            <div className="font-medium truncate text-white">{project.title}</div>
+            <div className="text-xs opacity-80 text-cosmic-aurora">{project.category_label}</div>
+            <div className="text-xs opacity-60 mt-1 line-clamp-2 text-gray-300">
+              {project.description || 'No description available'}
+            </div>
           </div>
         </Html>
       )}
@@ -153,21 +177,21 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
   );
 };
 
-// Coordinate system indicators
+// Coordinate system indicators with better visibility
 const CoordinateSystem: React.FC<{ visible: boolean }> = ({ visible }) => {
   if (!visible) return null;
 
   return (
     <>
       {/* X Axis - Red */}
-      <mesh position={[20, 0, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 40]} />
-        <meshBasicMaterial color="#ff0000" />
+      <mesh position={[15, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 30]} />
+        <meshBasicMaterial color="#ff4444" />
       </mesh>
       <Text
-        position={[22, 0, 0]}
-        fontSize={2}
-        color="#ff0000"
+        position={[18, 0, 0]}
+        fontSize={1.5}
+        color="#ff4444"
         anchorX="left"
         anchorY="middle"
       >
@@ -175,14 +199,14 @@ const CoordinateSystem: React.FC<{ visible: boolean }> = ({ visible }) => {
       </Text>
 
       {/* Y Axis - Green */}
-      <mesh position={[0, 20, 0]} rotation={[0, 0, Math.PI / 2]}>
-        <cylinderGeometry args={[0.05, 0.05, 40]} />
-        <meshBasicMaterial color="#00ff00" />
+      <mesh position={[0, 15, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.1, 0.1, 30]} />
+        <meshBasicMaterial color="#44ff44" />
       </mesh>
       <Text
-        position={[0, 22, 0]}
-        fontSize={2}
-        color="#00ff00"
+        position={[0, 18, 0]}
+        fontSize={1.5}
+        color="#44ff44"
         anchorX="center"
         anchorY="bottom"
       >
@@ -190,19 +214,30 @@ const CoordinateSystem: React.FC<{ visible: boolean }> = ({ visible }) => {
       </Text>
 
       {/* Z Axis - Blue */}
-      <mesh position={[0, 0, 20]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 40]} />
-        <meshBasicMaterial color="#0000ff" />
+      <mesh position={[0, 0, 15]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.1, 0.1, 30]} />
+        <meshBasicMaterial color="#4444ff" />
       </mesh>
       <Text
-        position={[0, 0, 22]}
-        fontSize={2}
-        color="#0000ff"
+        position={[0, 0, 18]}
+        fontSize={1.5}
+        color="#4444ff"
         anchorX="center"
         anchorY="middle"
       >
         Z (UMAP Dim 3)
       </Text>
+    </>
+  );
+};
+
+// Interactive grid to help with navigation
+const InteractiveGrid: React.FC = () => {
+  return (
+    <>
+      <gridHelper args={[50, 20, '#333333', '#222222']} position={[0, -15, 0]} />
+      <gridHelper args={[50, 20, '#333333', '#222222']} position={[0, 0, -15]} rotation={[Math.PI / 2, 0, 0]} />
+      <gridHelper args={[50, 20, '#333333', '#222222']} position={[-15, 0, 0]} rotation={[0, 0, Math.PI / 2]} />
     </>
   );
 };
@@ -214,14 +249,19 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
   highlightedProjects = []
 }) => {
   console.log('Scene3D rendering with projects:', projects.length);
+  console.log('Sample project coordinates:', projects.slice(0, 3).map(p => ({ title: p.title, x: p.x, y: p.y, z: p.z })));
 
   return (
     <>
       {/* Enhanced lighting setup */}
-      <ambientLight intensity={0.4} />
-      <pointLight position={[10, 10, 10]} intensity={1} color="#ffffff" />
-      <pointLight position={[-10, -10, -10]} intensity={0.6} color="#00D4AA" />
-      <pointLight position={[10, -10, 10]} intensity={0.4} color="#D946EF" />
+      <ambientLight intensity={0.6} />
+      <pointLight position={[20, 20, 20]} intensity={1.2} color="#ffffff" />
+      <pointLight position={[-20, -20, -20]} intensity={0.8} color="#00D4AA" />
+      <pointLight position={[20, -20, 20]} intensity={0.6} color="#D946EF" />
+      <hemisphereLight skyColor="#87CEEB" groundColor="#362D59" intensity={0.4} />
+      
+      {/* Interactive grid */}
+      <InteractiveGrid />
       
       {/* Render all projects */}
       {projects.map((project, index) => (
@@ -241,10 +281,13 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
         enableZoom={true}
         enablePan={true}
         enableRotate={true}
-        maxDistance={100}
-        minDistance={2}
+        maxDistance={150}
+        minDistance={3}
         dampingFactor={0.05}
         enableDamping={true}
+        zoomSpeed={0.8}
+        panSpeed={0.8}
+        rotateSpeed={0.5}
       />
     </>
   );
@@ -252,19 +295,19 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
 
 export const Scene3D: React.FC<Scene3DProps> = (props) => {
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full relative">
       <Canvas
-        camera={{ position: [30, 30, 30], fov: 60 }}
+        camera={{ position: [40, 40, 40], fov: 60 }}
         style={{ background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)' }}
       >
         <Scene3DContent {...props} />
       </Canvas>
       
       {/* Enhanced debug info */}
-      <div className="absolute bottom-4 left-4 glass-panel p-3 text-xs space-y-1">
-        <div className="font-semibold">3D Dataset Viewer</div>
-        <div>Projects: {props.projects.length}</div>
-        <div>Selected: {props.selectedProject?.title || 'None'}</div>
+      <div className="absolute bottom-4 left-4 glass-panel p-4 text-sm space-y-2">
+        <div className="font-semibold text-cosmic-aurora">3D Dataset Viewer</div>
+        <div>Projects: <span className="text-white">{props.projects.length}</span></div>
+        <div>Selected: <span className="text-cosmic-plasma">{props.selectedProject?.title || 'None'}</span></div>
         {props.highlightedProjects && props.highlightedProjects.length > 0 && (
           <div className="text-cosmic-aurora">
             AI Matches: {props.highlightedProjects.length}
@@ -272,12 +315,29 @@ export const Scene3D: React.FC<Scene3DProps> = (props) => {
         )}
       </div>
 
-      {/* Camera controls help */}
-      <div className="absolute top-4 left-4 glass-panel p-3 text-xs space-y-1">
-        <div className="font-semibold">Controls</div>
-        <div>• Drag to rotate</div>
-        <div>• Scroll to zoom</div>
-        <div>• Right-click drag to pan</div>
+      {/* Interactive camera controls help */}
+      <div className="absolute top-4 left-4 glass-panel p-4 text-sm space-y-2">
+        <div className="font-semibold text-cosmic-aurora">Interactive Controls</div>
+        <div className="space-y-1 text-gray-300">
+          <div>• <span className="text-white">Left-click drag:</span> Rotate view</div>
+          <div>• <span className="text-white">Right-click drag:</span> Pan camera</div>
+          <div>• <span className="text-white">Mouse wheel:</span> Zoom in/out</div>
+          <div>• <span className="text-white">Click nodes:</span> Select projects</div>
+          <div>• <span className="text-white">Hover nodes:</span> Quick preview</div>
+        </div>
+      </div>
+
+      {/* Performance info */}
+      <div className="absolute top-4 right-4 glass-panel p-3 text-sm">
+        <div className="text-cosmic-aurora font-semibold">Status</div>
+        <div className="text-white">
+          Showing {props.projects.length} projects
+        </div>
+        {props.highlightedProjects && props.highlightedProjects.length > 0 && (
+          <div className="text-cosmic-plasma">
+            {props.highlightedProjects.length} AI matches highlighted
+          </div>
+        )}
       </div>
     </div>
   );
