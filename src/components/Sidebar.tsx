@@ -129,14 +129,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium">Category</label>
           <Select
-            value={filters.category || ''}
-            onValueChange={(value) => onFilterChange('category', value || undefined)}
+            value={filters.category || "all"}
+            onValueChange={(value) => onFilterChange('category', value === "all" ? undefined : value)}
           >
             <SelectTrigger className="cosmic-input">
               <SelectValue placeholder="All categories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All categories</SelectItem>
+              <SelectItem value="all">All categories</SelectItem>
               {filterOptions.categories.map(category => (
                 <SelectItem key={category} value={category}>
                   {category}
@@ -150,14 +150,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium">Subcategory</label>
           <Select
-            value={filters.subcategory || ''}
-            onValueChange={(value) => onFilterChange('subcategory', value || undefined)}
+            value={filters.subcategory || "all"}
+            onValueChange={(value) => onFilterChange('subcategory', value === "all" ? undefined : value)}
           >
             <SelectTrigger className="cosmic-input">
               <SelectValue placeholder="All subcategories" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All subcategories</SelectItem>
+              <SelectItem value="all">All subcategories</SelectItem>
               {filterOptions.subcategories.map(subcategory => (
                 <SelectItem key={subcategory} value={subcategory}>
                   {subcategory}
