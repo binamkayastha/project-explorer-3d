@@ -62,7 +62,7 @@ export const useProjectFilters = (projects: Project[]) => {
     yearRange: projects.length > 0 ? [
       Math.min(...projects.map(p => p.launch_year)),
       Math.max(...projects.map(p => p.launch_year))
-    ] : [2020, 2024]
+    ] as [number, number] : [2020, 2024] as [number, number]
   }), [projects]);
 
   return {

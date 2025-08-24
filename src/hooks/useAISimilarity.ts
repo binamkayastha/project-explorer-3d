@@ -51,7 +51,7 @@ export const useAISimilarity = () => {
       
       // Get embedding for user idea
       const userEmbedding = await model(userIdea, { pooling: 'mean', normalize: true });
-      const userVector = Array.from(userEmbedding.data);
+      const userVector = Array.from(userEmbedding.data) as number[];
 
       // Calculate similarities
       const similarities: SimilarityResult[] = [];
@@ -61,7 +61,7 @@ export const useAISimilarity = () => {
         
         // Get embedding for project text
         const projectEmbedding = await model(project.text, { pooling: 'mean', normalize: true });
-        const projectVector = Array.from(projectEmbedding.data);
+        const projectVector = Array.from(projectEmbedding.data) as number[];
         
         const similarity = cosineSimilarity(userVector, projectVector);
         similarities.push({ project, similarity });

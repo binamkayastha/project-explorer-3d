@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, MeshProps } from '@react-three/fiber';
 import { OrbitControls, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { Project } from '@/types/project';
@@ -54,7 +54,10 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
 
   useFrame((state) => {
     if (meshRef.current && isRecent) {
-      meshRef.current.material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 2) * 0.3;
+      const material = meshRef.current.material as THREE.MeshStandardMaterial;
+      if (material) {
+        material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 2) * 0.3;
+      }
     }
   });
 
@@ -66,8 +69,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
   }, [isSelected, isHighlighted, hovered]);
 
   return (
-    <mesh
-      ref={meshRef}
+    <group
       position={[project.x * 10, project.y * 10, project.z * 10]}
       scale={scale}
       onClick={(e) => {
@@ -84,14 +86,16 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
         document.body.style.cursor = 'auto';
       }}
     >
-      <sphereGeometry args={[0.1, 16, 16]} />
-      <meshStandardMaterial
-        color={color}
-        transparent={true}
-        opacity={isRecent ? 0.8 : 0.7}
-        emissive={isHighlighted ? color : '#000000'}
-        emissiveIntensity={isHighlighted ? 0.3 : 0}
-      />
+      <mesh ref={meshRef}>
+        <sphereGeometry args={[0.1, 16, 16]} />
+        <meshStandardMaterial
+          color={color}
+          transparent={true}
+          opacity={isRecent ? 0.8 : 0.7}
+          emissive={isHighlighted ? color : '#000000'}
+          emissiveIntensity={isHighlighted ? 0.3 : 0}
+        />
+      </mesh>
       
       {isSelected && (
         <Html distanceFactor={10}>
@@ -109,7 +113,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
           </div>
         </Html>
       )}
-    </mesh>
+    </group>
   );
 };
 
