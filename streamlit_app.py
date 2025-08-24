@@ -343,8 +343,6 @@ if df is not None and len(df) > 0:
                 range_2 = f"{filtered_df[umap_cols[1]].min():.2f} to {filtered_df[umap_cols[1]].max():.2f}"
                 st.metric(f"{umap_cols[1]} Range", range_2)
     
-
-    
     st.markdown("---")
     
     # Charts Section
