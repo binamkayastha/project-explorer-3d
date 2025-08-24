@@ -1,6 +1,6 @@
 
 import React, { useRef, useState, useMemo } from 'react';
-import { Canvas, useFrame, MeshProps } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Text, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { Project } from '@/types/project';
@@ -13,7 +13,7 @@ interface Scene3DProps {
   highlightedProjects?: Project[];
 }
 
-// Color palette for categories
+// Enhanced color palette for categories
 const getCategoryColor = (categoryLabel: string): string => {
   const colors = [
     '#00D4AA', // cosmic-aurora
@@ -24,6 +24,8 @@ const getCategoryColor = (categoryLabel: string): string => {
     '#10B981', // emerald
     '#8B5CF6', // violet
     '#F97316', // orange
+    '#06B6D4', // cyan
+    '#84CC16', // lime
   ];
   
   const hash = categoryLabel.split('').reduce((acc, char) => {
@@ -31,6 +33,16 @@ const getCategoryColor = (categoryLabel: string): string => {
   }, 0);
   
   return colors[Math.abs(hash) % colors.length];
+};
+
+// Enhanced shape selection based on category
+const getCategoryShape = (categoryLabel: string): 'sphere' | 'box' | 'octahedron' => {
+  const shapes = ['sphere', 'box', 'octahedron'];
+  const hash = categoryLabel.split('').reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+  
+  return shapes[Math.abs(hash) % shapes.length] as 'sphere' | 'box' | 'octahedron';
 };
 
 interface ProjectNodeProps {
@@ -50,30 +62,44 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
   const [hovered, setHovered] = useState(false);
 
   const color = getCategoryColor(project.category_label);
+  const shape = getCategoryShape(project.category_label);
   const isRecent = project.launch_year >= 2023;
 
   useFrame((state) => {
-    if (meshRef.current && isRecent) {
+    if (meshRef.current && (isRecent || isHighlighted)) {
       const material = meshRef.current.material as THREE.MeshStandardMaterial;
       if (material) {
-        material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 2) * 0.3;
+        material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 2) * 0.2;
       }
     }
   });
 
   const scale = useMemo(() => {
-    if (isSelected) return 3;
-    if (isHighlighted) return 2.5;
-    if (hovered) return 2;
+    if (isSelected) return 2.5;
+    if (isHighlighted) return 2;
+    if (hovered) return 1.5;
     return 1;
   }, [isSelected, isHighlighted, hovered]);
 
-  // Use safer coordinates with fallbacks
+  // Use project coordinates with fallbacks
   const position: [number, number, number] = [
-    (project.x || 0) * 5,
-    (project.y || 0) * 5,
-    (project.z || 0) * 5
+    project.x || 0,
+    project.y || 0,
+    project.z || 0
   ];
+
+  // Render different geometries based on category
+  const renderGeometry = () => {
+    const baseSize = 0.3;
+    switch (shape) {
+      case 'box':
+        return <boxGeometry args={[baseSize, baseSize, baseSize]} />;
+      case 'octahedron':
+        return <octahedronGeometry args={[baseSize]} />;
+      default:
+        return <sphereGeometry args={[baseSize, 16, 16]} />;
+    }
+  };
 
   return (
     <group
@@ -94,18 +120,20 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
       }}
     >
       <mesh ref={meshRef}>
-        <sphereGeometry args={[0.2, 16, 16]} />
+        {renderGeometry()}
         <meshStandardMaterial
           color={color}
           transparent={true}
-          opacity={isRecent ? 0.8 : 0.7}
+          opacity={isRecent ? 0.9 : 0.7}
           emissive={isHighlighted ? color : '#000000'}
           emissiveIntensity={isHighlighted ? 0.3 : 0}
+          roughness={0.4}
+          metalness={0.1}
         />
       </mesh>
       
       {isSelected && (
-        <Html distanceFactor={10}>
+        <Html distanceFactor={8}>
           <div className="animate-scale-in">
             <ProjectCard project={project} />
           </div>
@@ -113,10 +141,11 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
       )}
       
       {hovered && !isSelected && (
-        <Html distanceFactor={15}>
-          <div className="cosmic-tooltip animate-fade-in">
-            <div className="font-medium">{project.title}</div>
+        <Html distanceFactor={12}>
+          <div className="cosmic-tooltip animate-fade-in max-w-xs">
+            <div className="font-medium truncate">{project.title}</div>
             <div className="text-xs opacity-80">{project.category_label}</div>
+            <div className="text-xs opacity-60 mt-1 line-clamp-2">{project.description}</div>
           </div>
         </Html>
       )}
@@ -124,22 +153,57 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
   );
 };
 
-// Add a test cube to verify the scene is working
-const TestCube: React.FC = () => {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.x = state.clock.elapsedTime * 0.5;
-      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
-    }
-  });
+// Coordinate system indicators
+const CoordinateSystem: React.FC<{ visible: boolean }> = ({ visible }) => {
+  if (!visible) return null;
 
   return (
-    <mesh ref={meshRef} position={[0, 0, 0]}>
-      <boxGeometry args={[1, 1, 1]} />
-      <meshStandardMaterial color="#00D4AA" />
-    </mesh>
+    <>
+      {/* X Axis - Red */}
+      <mesh position={[20, 0, 0]}>
+        <cylinderGeometry args={[0.05, 0.05, 40]} />
+        <meshBasicMaterial color="#ff0000" />
+      </mesh>
+      <Text
+        position={[22, 0, 0]}
+        fontSize={2}
+        color="#ff0000"
+        anchorX="left"
+        anchorY="middle"
+      >
+        X (UMAP Dim 1)
+      </Text>
+
+      {/* Y Axis - Green */}
+      <mesh position={[0, 20, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <cylinderGeometry args={[0.05, 0.05, 40]} />
+        <meshBasicMaterial color="#00ff00" />
+      </mesh>
+      <Text
+        position={[0, 22, 0]}
+        fontSize={2}
+        color="#00ff00"
+        anchorX="center"
+        anchorY="bottom"
+      >
+        Y (UMAP Dim 2)
+      </Text>
+
+      {/* Z Axis - Blue */}
+      <mesh position={[0, 0, 20]} rotation={[Math.PI / 2, 0, 0]}>
+        <cylinderGeometry args={[0.05, 0.05, 40]} />
+        <meshBasicMaterial color="#0000ff" />
+      </mesh>
+      <Text
+        position={[0, 0, 22]}
+        fontSize={2}
+        color="#0000ff"
+        anchorX="center"
+        anchorY="middle"
+      >
+        Z (UMAP Dim 3)
+      </Text>
+    </>
   );
 };
 
@@ -153,13 +217,13 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
 
   return (
     <>
-      <ambientLight intensity={0.6} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#00D4AA" />
+      {/* Enhanced lighting setup */}
+      <ambientLight intensity={0.4} />
+      <pointLight position={[10, 10, 10]} intensity={1} color="#ffffff" />
+      <pointLight position={[-10, -10, -10]} intensity={0.6} color="#00D4AA" />
+      <pointLight position={[10, -10, 10]} intensity={0.4} color="#D946EF" />
       
-      {/* Show test cube if no projects */}
-      {projects.length === 0 && <TestCube />}
-      
+      {/* Render all projects */}
       {projects.map((project, index) => (
         <ProjectNode
           key={`${project.title}-${index}`}
@@ -170,45 +234,17 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
         />
       ))}
 
-      {/* Axis labels - only show if we have projects */}
-      {projects.length > 0 && (
-        <>
-          <Text
-            position={[15, 0, 0]}
-            fontSize={1}
-            color="#00D4AA"
-            anchorX="center"
-            anchorY="middle"
-          >
-            X Axis
-          </Text>
-          <Text
-            position={[0, 15, 0]}
-            fontSize={1}
-            color="#D946EF"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Y Axis
-          </Text>
-          <Text
-            position={[0, 0, 15]}
-            fontSize={1}
-            color="#3B82F6"
-            anchorX="center"
-            anchorY="middle"
-          >
-            Z Axis
-          </Text>
-        </>
-      )}
+      {/* Coordinate system */}
+      <CoordinateSystem visible={projects.length > 0} />
 
       <OrbitControls
         enableZoom={true}
         enablePan={true}
         enableRotate={true}
-        maxDistance={50}
-        minDistance={5}
+        maxDistance={100}
+        minDistance={2}
+        dampingFactor={0.05}
+        enableDamping={true}
       />
     </>
   );
@@ -218,16 +254,30 @@ export const Scene3D: React.FC<Scene3DProps> = (props) => {
   return (
     <div className="w-full h-full">
       <Canvas
-        camera={{ position: [15, 15, 15], fov: 60 }}
-        style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' }}
+        camera={{ position: [30, 30, 30], fov: 60 }}
+        style={{ background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)' }}
       >
         <Scene3DContent {...props} />
       </Canvas>
       
-      {/* Debug info */}
-      <div className="absolute bottom-4 left-4 glass-panel p-2 text-xs">
+      {/* Enhanced debug info */}
+      <div className="absolute bottom-4 left-4 glass-panel p-3 text-xs space-y-1">
+        <div className="font-semibold">3D Dataset Viewer</div>
         <div>Projects: {props.projects.length}</div>
         <div>Selected: {props.selectedProject?.title || 'None'}</div>
+        {props.highlightedProjects && props.highlightedProjects.length > 0 && (
+          <div className="text-cosmic-aurora">
+            AI Matches: {props.highlightedProjects.length}
+          </div>
+        )}
+      </div>
+
+      {/* Camera controls help */}
+      <div className="absolute top-4 left-4 glass-panel p-3 text-xs space-y-1">
+        <div className="font-semibold">Controls</div>
+        <div>• Drag to rotate</div>
+        <div>• Scroll to zoom</div>
+        <div>• Right-click drag to pan</div>
       </div>
     </div>
   );
