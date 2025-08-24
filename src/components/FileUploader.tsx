@@ -100,6 +100,17 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
               <p className="text-sm text-muted-foreground">
                 Expected columns: title, description, tags, category, x, y, z, text, etc.
               </p>
+              
+              {/* Add detailed format information */}
+              <div className="mt-4 p-4 bg-cosmic-nebula/20 rounded-lg text-left">
+                <h4 className="font-medium text-foreground mb-2">Required CSV Format:</h4>
+                <div className="text-xs space-y-1 text-muted-foreground">
+                  <div><strong>Required:</strong> name/title, x/y coordinates (umap_dim_1/umap_dim_2 or x/y)</div>
+                  <div><strong>Optional:</strong> z coordinate, description, category, tags, launch_year</div>
+                  <div><strong>Example headers:</strong> name, umap_dim_1, umap_dim_2, umap_dim_3, description, category</div>
+                  <div><strong>Alternative:</strong> title, x, y, z, detailed_description, category_label</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

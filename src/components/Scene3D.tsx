@@ -84,7 +84,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
     if (isSelected) return 3;
     if (isHighlighted) return 2.2;
     if (hovered) return 1.8;
-    return 1.2;
+    return 1.5; // Increased base scale for better visibility
   }, [isSelected, isHighlighted, hovered]);
 
   // Ensure we have valid coordinates with better fallbacks
@@ -94,11 +94,14 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
     (project.z !== undefined && !isNaN(project.z)) ? project.z : Math.random() * 20 - 10
   ];
 
-  console.log(`Project "${project.title}" position:`, position);
+  // Debug logging for first few projects
+  if (Math.random() < 0.1) { // Only log 10% of projects to avoid spam
+    console.log(`ProjectNode "${project.title}" position:`, position, 'scale:', scale);
+  }
 
   // Render different geometries based on category
   const renderGeometry = () => {
-    const baseSize = 0.5; // Increased base size for better visibility
+    const baseSize = 0.8; // Increased base size for better visibility
     switch (shape) {
       case 'box':
         return <boxGeometry args={[baseSize, baseSize, baseSize]} />;
@@ -116,7 +119,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
       onClick={(e) => {
         e.stopPropagation();
         onClick(project);
-        console.log('Clicked project:', project.title);
+        console.log('Clicked project:', project.title, 'at position:', position);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -153,6 +156,17 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
           />
         </mesh>
       )}
+      
+      {/* Add a small glow effect for all projects to make them more visible */}
+      <mesh scale={1.3}>
+        {renderGeometry()}
+        <meshBasicMaterial
+          color={color}
+          transparent={true}
+          opacity={0.1}
+          side={THREE.BackSide}
+        />
+      </mesh>
       
       {isSelected && (
         <Html distanceFactor={6} position={[0, 1, 0]}>
@@ -248,8 +262,65 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
   onProjectClick,
   highlightedProjects = []
 }) => {
-  console.log('Scene3D rendering with projects:', projects.length);
-  console.log('Sample project coordinates:', projects.slice(0, 3).map(p => ({ title: p.title, x: p.x, y: p.y, z: p.z })));
+  console.log('=== Scene3D RENDERING ===');
+  console.log('Total projects to render:', projects.length);
+  console.log('Sample project coordinates:', projects.slice(0, 3).map(p => ({ 
+    title: p.title, 
+    x: p.x, 
+    y: p.y, 
+    z: p.z,
+    category: p.category_label 
+  })));
+
+  // Check if we have valid coordinates
+  const validProjects = projects.filter(p => 
+    p.x !== undefined && !isNaN(p.x) && 
+    p.y !== undefined && !isNaN(p.y) && 
+    p.z !== undefined && !isNaN(p.z)
+  );
+
+  console.log('Projects with valid coordinates:', validProjects.length);
+
+  if (validProjects.length === 0) {
+    console.warn('⚠️ No projects with valid coordinates found!');
+    return (
+      <>
+        <ambientLight intensity={0.6} />
+        <pointLight position={[20, 20, 20]} intensity={1.2} color="#ffffff" />
+        <InteractiveGrid />
+        <Text
+          position={[0, 0, 0]}
+          fontSize={2}
+          color="#ff4444"
+          anchorX="center"
+          anchorY="middle"
+        >
+          No data points to display
+        </Text>
+        <Text
+          position={[0, -3, 0]}
+          fontSize={1}
+          color="#cccccc"
+          anchorX="center"
+          anchorY="middle"
+        >
+          Check your CSV file format
+        </Text>
+        <OrbitControls
+          enableZoom={true}
+          enablePan={true}
+          enableRotate={true}
+          maxDistance={150}
+          minDistance={3}
+          dampingFactor={0.05}
+          enableDamping={true}
+          zoomSpeed={0.8}
+          panSpeed={0.8}
+          rotateSpeed={0.5}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -264,7 +335,7 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
       <InteractiveGrid />
       
       {/* Render all projects */}
-      {projects.map((project, index) => (
+      {validProjects.map((project, index) => (
         <ProjectNode
           key={`${project.title}-${index}`}
           project={project}
@@ -275,7 +346,7 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
       ))}
 
       {/* Coordinate system */}
-      <CoordinateSystem visible={projects.length > 0} />
+      <CoordinateSystem visible={validProjects.length > 0} />
 
       <OrbitControls
         enableZoom={true}
@@ -307,10 +378,37 @@ export const Scene3D: React.FC<Scene3DProps> = (props) => {
       <div className="absolute bottom-4 left-4 glass-panel p-4 text-sm space-y-2">
         <div className="font-semibold text-cosmic-aurora">3D Dataset Viewer</div>
         <div>Projects: <span className="text-white">{props.projects.length}</span></div>
+        <div>Valid coordinates: <span className="text-white">{props.projects.filter(p => p.x !== undefined && !isNaN(p.x) && p.y !== undefined && !isNaN(p.y) && p.z !== undefined && !isNaN(p.z)).length}</span></div>
         <div>Selected: <span className="text-cosmic-plasma">{props.selectedProject?.title || 'None'}</span></div>
         {props.highlightedProjects && props.highlightedProjects.length > 0 && (
           <div className="text-cosmic-aurora">
             AI Matches: {props.highlightedProjects.length}
+          </div>
+        )}
+        
+        {/* Coordinate ranges */}
+        {props.projects.length > 0 && (
+          <div className="mt-2 pt-2 border-t border-gray-600">
+            <div className="text-xs text-gray-400">Coordinate Ranges:</div>
+            {(() => {
+              const validProjects = props.projects.filter(p => p.x !== undefined && !isNaN(p.x) && p.y !== undefined && !isNaN(p.y) && p.z !== undefined && !isNaN(p.z));
+              if (validProjects.length > 0) {
+                const xCoords = validProjects.map(p => p.x);
+                const yCoords = validProjects.map(p => p.y);
+                const zCoords = validProjects.map(p => p.z);
+                const xRange = [Math.min(...xCoords), Math.max(...xCoords)];
+                const yRange = [Math.min(...yCoords), Math.max(...yCoords)];
+                const zRange = [Math.min(...zCoords), Math.max(...zCoords)];
+                return (
+                  <div className="text-xs space-y-1">
+                    <div>X: {xRange[0].toFixed(1)} to {xRange[1].toFixed(1)}</div>
+                    <div>Y: {yRange[0].toFixed(1)} to {yRange[1].toFixed(1)}</div>
+                    <div>Z: {zRange[0].toFixed(1)} to {zRange[1].toFixed(1)}</div>
+                  </div>
+                );
+              }
+              return <div className="text-xs text-red-400">No valid coordinates</div>;
+            })()}
           </div>
         )}
       </div>
