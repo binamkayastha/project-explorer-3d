@@ -19,9 +19,13 @@ export const MainApp: React.FC<MainAppProps> = ({ initialProjects }) => {
   
   const { findSimilarProjects, loading: aiLoading } = useAISimilarity();
   
+  console.log('MainApp rendering with initialProjects:', initialProjects.length);
+  console.log('MainApp current projects state:', projects.length);
+  
   // Initialize projects
   useEffect(() => {
     if (initialProjects.length > 0) {
+      console.log('Setting projects from initialProjects');
       setProjects(initialProjects);
     }
   }, [initialProjects, setProjects]);
@@ -33,6 +37,8 @@ export const MainApp: React.FC<MainAppProps> = ({ initialProjects }) => {
     clearFilters,
     filterOptions
   } = useProjectFilters(projects);
+
+  console.log('Filtered projects:', filteredProjects.length);
 
   const handleProjectClick = (project: Project) => {
     setSelectedProject(selectedProject?.title === project.title ? null : project);

@@ -68,9 +68,16 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
     return 1;
   }, [isSelected, isHighlighted, hovered]);
 
+  // Use safer coordinates with fallbacks
+  const position: [number, number, number] = [
+    (project.x || 0) * 5,
+    (project.y || 0) * 5,
+    (project.z || 0) * 5
+  ];
+
   return (
     <group
-      position={[project.x * 10, project.y * 10, project.z * 10]}
+      position={position}
       scale={scale}
       onClick={(e) => {
         e.stopPropagation();
@@ -87,7 +94,7 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
       }}
     >
       <mesh ref={meshRef}>
-        <sphereGeometry args={[0.1, 16, 16]} />
+        <sphereGeometry args={[0.2, 16, 16]} />
         <meshStandardMaterial
           color={color}
           transparent={true}
@@ -117,17 +124,41 @@ const ProjectNode: React.FC<ProjectNodeProps> = ({
   );
 };
 
+// Add a test cube to verify the scene is working
+const TestCube: React.FC = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.x = state.clock.elapsedTime * 0.5;
+      meshRef.current.rotation.y = state.clock.elapsedTime * 0.3;
+    }
+  });
+
+  return (
+    <mesh ref={meshRef} position={[0, 0, 0]}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshStandardMaterial color="#00D4AA" />
+    </mesh>
+  );
+};
+
 const Scene3DContent: React.FC<Scene3DProps> = ({
   projects,
   selectedProject,
   onProjectClick,
   highlightedProjects = []
 }) => {
+  console.log('Scene3D rendering with projects:', projects.length);
+
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <pointLight position={[10, 10, 10]} intensity={0.8} />
-      <pointLight position={[-10, -10, -10]} intensity={0.4} color="#00D4AA" />
+      <ambientLight intensity={0.6} />
+      <pointLight position={[10, 10, 10]} intensity={1} />
+      <pointLight position={[-10, -10, -10]} intensity={0.5} color="#00D4AA" />
+      
+      {/* Show test cube if no projects */}
+      {projects.length === 0 && <TestCube />}
       
       {projects.map((project, index) => (
         <ProjectNode
@@ -139,34 +170,38 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
         />
       ))}
 
-      {/* Axis labels */}
-      <Text
-        position={[15, 0, 0]}
-        fontSize={1}
-        color="#00D4AA"
-        anchorX="center"
-        anchorY="middle"
-      >
-        X Axis
-      </Text>
-      <Text
-        position={[0, 15, 0]}
-        fontSize={1}
-        color="#D946EF"
-        anchorX="center"
-        anchorY="middle"
-      >
-        Y Axis
-      </Text>
-      <Text
-        position={[0, 0, 15]}
-        fontSize={1}
-        color="#3B82F6"
-        anchorX="center"
-        anchorY="middle"
-      >
-        Z Axis
-      </Text>
+      {/* Axis labels - only show if we have projects */}
+      {projects.length > 0 && (
+        <>
+          <Text
+            position={[15, 0, 0]}
+            fontSize={1}
+            color="#00D4AA"
+            anchorX="center"
+            anchorY="middle"
+          >
+            X Axis
+          </Text>
+          <Text
+            position={[0, 15, 0]}
+            fontSize={1}
+            color="#D946EF"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Y Axis
+          </Text>
+          <Text
+            position={[0, 0, 15]}
+            fontSize={1}
+            color="#3B82F6"
+            anchorX="center"
+            anchorY="middle"
+          >
+            Z Axis
+          </Text>
+        </>
+      )}
 
       <OrbitControls
         enableZoom={true}
@@ -184,10 +219,16 @@ export const Scene3D: React.FC<Scene3DProps> = (props) => {
     <div className="w-full h-full">
       <Canvas
         camera={{ position: [15, 15, 15], fov: 60 }}
-        style={{ background: 'transparent' }}
+        style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)' }}
       >
         <Scene3DContent {...props} />
       </Canvas>
+      
+      {/* Debug info */}
+      <div className="absolute bottom-4 left-4 glass-panel p-2 text-xs">
+        <div>Projects: {props.projects.length}</div>
+        <div>Selected: {props.selectedProject?.title || 'None'}</div>
+      </div>
     </div>
   );
 };
