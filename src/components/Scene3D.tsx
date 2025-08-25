@@ -324,12 +324,12 @@ const Scene3DContent: React.FC<Scene3DProps> = ({
 
   return (
     <>
-      {/* Enhanced lighting setup */}
+      {/* Enhanced lighting setup - Fixed hemisphereLight props */}
       <ambientLight intensity={0.6} />
       <pointLight position={[20, 20, 20]} intensity={1.2} color="#ffffff" />
       <pointLight position={[-20, -20, -20]} intensity={0.8} color="#00D4AA" />
       <pointLight position={[20, -20, 20]} intensity={0.6} color="#D946EF" />
-      <hemisphereLight skyColor="#87CEEB" groundColor="#362D59" intensity={0.4} />
+      <hemisphereLight args={["#87CEEB", "#362D59", 0.4]} />
       
       {/* Interactive grid */}
       <InteractiveGrid />

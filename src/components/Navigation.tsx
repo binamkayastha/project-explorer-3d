@@ -1,7 +1,8 @@
+
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Cube, BarChart3 } from 'lucide-react';
+import { Box, BarChart3 } from 'lucide-react';
 
 const Navigation: React.FC = () => {
   const location = useLocation();
@@ -19,7 +20,7 @@ const Navigation: React.FC = () => {
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
-            <Cube className="w-4 h-4" />
+            <Box className="w-4 h-4" />
             3D Viewer
           </Button>
         </Link>
