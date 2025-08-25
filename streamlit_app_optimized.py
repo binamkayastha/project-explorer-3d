@@ -5,6 +5,24 @@ import plotly.graph_objects as go
 import numpy as np
 from datetime import datetime
 import plotly.offline as pyo
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import string
+
+# Download required NLTK data
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    nltk.download('stopwords')
 
 # Page config
 st.set_page_config(
@@ -63,12 +81,45 @@ st.markdown("""
         color: #D946EF;
         text-decoration: underline;
     }
+    .chatbot-container {
+        background: linear-gradient(135deg, rgba(0, 212, 170, 0.1), rgba(217, 70, 239, 0.1));
+        border-radius: 1rem;
+        padding: 2rem;
+        border: 1px solid rgba(0, 212, 170, 0.3);
+        margin: 2rem 0;
+    }
+    .chat-message {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border-left: 4px solid #00D4AA;
+    }
+    .user-message {
+        background: rgba(217, 70, 239, 0.1);
+        border-left: 4px solid #D946EF;
+    }
+    .project-match {
+        background: rgba(0, 212, 170, 0.1);
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin: 0.5rem 0;
+        border: 1px solid rgba(0, 212, 170, 0.3);
+    }
+    .similarity-score {
+        background: linear-gradient(45deg, #00D4AA, #D946EF);
+        color: white;
+        padding: 0.2rem 0.5rem;
+        border-radius: 1rem;
+        font-size: 0.8rem;
+        font-weight: bold;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # Title
 st.markdown('<h1 class="main-header">🚀 Sundai Projects Explorer</h1>', unsafe_allow_html=True)
-st.markdown("### Interactive 3D Analytics for Sundai Projects Dataset")
+st.markdown("### Interactive 3D Analytics & AI-Powered Project Finder")
 
 # File upload section
 st.markdown("---")
@@ -130,10 +181,232 @@ def load_sundai_data(uploaded_file):
             return None
     return None
 
+# AI Chatbot functions
+def preprocess_text(text):
+    """Preprocess text for similarity matching"""
+    if pd.isna(text) or text == '':
+        return ''
+    
+    # Convert to lowercase
+    text = text.lower()
+    
+    # Remove punctuation
+    text = text.translate(str.maketrans('', '', string.punctuation))
+    
+    # Tokenize
+    tokens = word_tokenize(text)
+    
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
+    
+    return ' '.join(tokens)
+
+def extract_github_url(description):
+    """Extract GitHub URL from project description"""
+    if pd.isna(description) or description == '':
+        return None
+    
+    # Look for GitHub URLs in the description
+    github_patterns = [
+        r'https?://github\.com/[^\s\)]+',
+        r'github\.com/[^\s\)]+',
+        r'GitHub URL[:\s]*([^\s\)]+)',
+        r'GitHub Repository[:\s]*([^\s\)]+)'
+    ]
+    
+    for pattern in github_patterns:
+        matches = re.findall(pattern, description, re.IGNORECASE)
+        if matches:
+            url = matches[0]
+            if not url.startswith('http'):
+                url = 'https://' + url
+            return url
+    
+    return None
+
+def find_similar_projects(user_query, df, top_k=5):
+    """Find similar projects based on user query"""
+    if df is None or len(df) == 0:
+        return []
+    
+    # Preprocess user query
+    processed_query = preprocess_text(user_query)
+    
+    # Create combined text for each project
+    project_texts = []
+    for _, row in df.iterrows():
+        combined_text = f"{row.get('title', '')} {row.get('description', '')} {row.get('category', '')} {row.get('subcategory_1', '')} {row.get('subcategory_2', '')} {row.get('subcategory_3', '')}"
+        processed_text = preprocess_text(combined_text)
+        project_texts.append(processed_text)
+    
+    # Create TF-IDF vectors
+    vectorizer = TfidfVectorizer(max_features=1000, ngram_range=(1, 2))
+    try:
+        tfidf_matrix = vectorizer.fit_transform(project_texts)
+        query_vector = vectorizer.transform([processed_query])
+        
+        # Calculate cosine similarity
+        similarities = cosine_similarity(query_vector, tfidf_matrix).flatten()
+        
+        # Get top matches
+        top_indices = similarities.argsort()[-top_k:][::-1]
+        
+        results = []
+        for idx in top_indices:
+            if similarities[idx] > 0:  # Only include relevant matches
+                project = df.iloc[idx]
+                github_url = extract_github_url(project.get('description', ''))
+                
+                results.append({
+                    'title': project.get('title', ''),
+                    'description': project.get('description', ''),
+                    'category': project.get('category', ''),
+                    'subcategory_1': project.get('subcategory_1', ''),
+                    'project_url': project.get('project_url', ''),
+                    'github_url': github_url,
+                    'similarity_score': similarities[idx],
+                    'umap_coords': (project.get('x', 0), project.get('y', 0), project.get('z', 0))
+                })
+        
+        return results
+    except Exception as e:
+        st.error(f"Error in similarity matching: {str(e)}")
+        return []
+
+def format_project_match(project, index):
+    """Format a project match for display"""
+    similarity_percentage = project['similarity_score'] * 100
+    
+    st.markdown(f"""
+    <div class="project-match">
+        <h4>🎯 Match #{index + 1}: {project['title']}</h4>
+        <div class="similarity-score">Similarity: {similarity_percentage:.1f}%</div>
+        <p><strong>Category:</strong> {project['category']}</p>
+        <p><strong>Subcategory:</strong> {project['subcategory_1'] if project['subcategory_1'] else 'N/A'}</p>
+        <p><strong>Description:</strong> {project['description'][:200]}{'...' if len(project['description']) > 200 else ''}</p>
+        <p><strong>UMAP Coordinates:</strong> ({project['umap_coords'][0]:.3f}, {project['umap_coords'][1]:.3f}, {project['umap_coords'][2]:.3f})</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        if project['project_url'] and pd.notna(project['project_url']) and project['project_url'] != '':
+            st.markdown(
+                f"<a href='{project['project_url']}' target='_blank' class='project-link'>🌐 Visit Project Website</a>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.write("❌ No project URL available")
+    
+    with col2:
+        if project['github_url']:
+            st.markdown(
+                f"<a href='{project['github_url']}' target='_blank' class='project-link'>📚 View on GitHub</a>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.write("❌ No GitHub URL found")
+    
+    with col3:
+        st.markdown(
+            f"<span class='similarity-score'>Match Score: {similarity_percentage:.1f}%</span>",
+            unsafe_allow_html=True
+        )
+
 # Load data
 df = load_sundai_data(uploaded_file)
 
 if df is not None and len(df) > 0:
+    # AI Chatbot Section
+    st.markdown("---")
+    st.markdown("### 🤖 AI Project Finder Chatbot")
+    st.markdown("Describe your project idea and I'll find the best matching projects from the dataset!")
+    
+    with st.container():
+        st.markdown("""
+        <div class="chatbot-container">
+            <h3>💡 How it works:</h3>
+            <ul>
+                <li>Describe your project idea in natural language</li>
+                <li>I'll analyze your description and find similar projects</li>
+                <li>Get project URLs, GitHub links, descriptions, and UMAP coordinates</li>
+                <li>See similarity scores to understand how well each project matches</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Chat interface
+        user_query = st.text_area(
+            "Describe your project idea:",
+            placeholder="Example: I want to build a mobile app for real estate agents that uses AI to help with property management and client communication...",
+            height=100
+        )
+        
+        if st.button("🔍 Find Similar Projects", type="primary"):
+            if user_query.strip():
+                with st.spinner("🤖 Analyzing your idea and finding similar projects..."):
+                    # Find similar projects
+                    similar_projects = find_similar_projects(user_query, df, top_k=5)
+                    
+                    if similar_projects:
+                        st.success(f"✅ Found {len(similar_projects)} similar projects!")
+                        
+                        # Display user query
+                        st.markdown(f"""
+                        <div class="chat-message user-message">
+                            <strong>Your Idea:</strong> {user_query}
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Display bot response
+                        st.markdown(f"""
+                        <div class="chat-message">
+                            <strong>🤖 AI Assistant:</strong> I found {len(similar_projects)} projects that match your idea! 
+                            Here are the best matches with their details:
+                        </div>
+                        """, unsafe_allow_html=True)
+                        
+                        # Display project matches
+                        for i, project in enumerate(similar_projects):
+                            format_project_match(project, i)
+                        
+                        # Summary
+                        st.markdown("---")
+                        st.markdown("### 📊 Match Summary")
+                        col1, col2, col3 = st.columns(3)
+                        
+                        with col1:
+                            st.metric("Total Matches", len(similar_projects))
+                        
+                        with col2:
+                            avg_similarity = np.mean([p['similarity_score'] for p in similar_projects]) * 100
+                            st.metric("Avg Similarity", f"{avg_similarity:.1f}%")
+                        
+                        with col3:
+                            categories_found = len(set([p['category'] for p in similar_projects]))
+                            st.metric("Categories Found", categories_found)
+                        
+                        # Show UMAP coordinates for matches
+                        if any(p['umap_coords'] != (0, 0, 0) for p in similar_projects):
+                            st.markdown("### 🗺️ Where to Find These Projects in 3D Space")
+                            for i, project in enumerate(similar_projects):
+                                if project['umap_coords'] != (0, 0, 0):
+                                    st.write(f"**{project['title']}:** UMAP({project['umap_coords'][0]:.3f}, {project['umap_coords'][1]:.3f}, {project['umap_coords'][2]:.3f})")
+                        
+                    else:
+                        st.warning("❌ No similar projects found. Try describing your idea in more detail or using different keywords.")
+                        
+                        # Suggest categories
+                        if 'category' in df.columns:
+                            st.markdown("### 💡 Available Project Categories:")
+                            categories = df['category'].value_counts().head(10)
+                            for cat, count in categories.items():
+                                st.write(f"• **{cat}** ({count} projects)")
+            else:
+                st.warning("Please describe your project idea to find similar projects.")
+    
     # Show data overview
     with st.expander("📊 Dataset Overview"):
         st.write(f"**Total Projects:** {len(df)}")
@@ -657,9 +930,10 @@ else:
     st.markdown("### 🎯 How to Use")
     st.markdown("""
     1. **Upload your CSV file** using the file uploader above
-    2. **Explore categories** and subcategories in the sidebar filters
-    3. **View 3D visualizations** with different coloring options
-    4. **Click on data points** to visit project websites
-    5. **Search projects** by name or description
-    6. **Export filtered data** for further analysis
+    2. **Use the AI chatbot** to find similar projects based on your ideas
+    3. **Explore categories** and subcategories in the sidebar filters
+    4. **View 3D visualizations** with different coloring options
+    5. **Click on data points** to visit project websites
+    6. **Search projects** by name or description
+    7. **Export filtered data** for further analysis
     """)
