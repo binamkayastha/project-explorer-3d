@@ -54,6 +54,15 @@ st.markdown("""
         margin: 0.2rem;
         font-size: 0.8rem;
     }
+    .project-link {
+        color: #00D4AA;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .project-link:hover {
+        color: #D946EF;
+        text-decoration: underline;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -290,7 +299,12 @@ if df is not None and len(df) > 0:
             # Color by category
             fig_3d = go.Figure()
             
-            for category in filtered_df['category'].unique():
+            # Create color mapping for categories
+            unique_categories = filtered_df['category'].unique()
+            colors = px.colors.qualitative.Set3[:len(unique_categories)]
+            color_map = dict(zip(unique_categories, colors))
+            
+            for category in unique_categories:
                 cat_data = filtered_df[filtered_df['category'] == category]
                 fig_3d.add_trace(go.Scatter3d(
                     x=cat_data['x'],
@@ -300,18 +314,21 @@ if df is not None and len(df) > 0:
                     name=category,
                     marker=dict(
                         size=8,
-                        opacity=0.8
+                        opacity=0.8,
+                        color=color_map[category]
                     ),
                     text=cat_data['title'],
+                    customdata=cat_data['project_url'] if 'project_url' in cat_data.columns else None,
                     hovertemplate='<b>%{text}</b><br>' +
                                   'Category: ' + category + '<br>' +
                                   'X: %{x:.3f}<br>' +
                                   'Y: %{y:.3f}<br>' +
-                                  'Z: %{z:.3f}<extra></extra>'
+                                  'Z: %{z:.3f}<br>' +
+                                  '<extra></extra>'
                 ))
             
             fig_3d.update_layout(
-                title='3D Project Space - Category Clusters',
+                title='3D Project Space - Category Clusters (Click points to visit project websites)',
                 scene=dict(
                     xaxis_title='UMAP Dimension 1',
                     yaxis_title='UMAP Dimension 2',
@@ -321,6 +338,12 @@ if df is not None and len(df) > 0:
                 width=800,
                 height=600
             )
+            
+            # Add click event handling
+            fig_3d.update_traces(
+                customdata=filtered_df['project_url'].tolist() if 'project_url' in filtered_df.columns else None
+            )
+            
             st.plotly_chart(fig_3d, use_container_width=True)
         
         elif viz_option == "Subcategory Groups":
@@ -329,6 +352,10 @@ if df is not None and len(df) > 0:
             
             # Get top subcategories for coloring
             top_subcats = filtered_df['subcategory_1'].value_counts().head(8).index.tolist()
+            
+            # Create color mapping for subcategories
+            colors = px.colors.qualitative.Set3[:len(top_subcats)]
+            color_map = dict(zip(top_subcats, colors))
             
             for subcat in top_subcats:
                 if subcat != '':
@@ -341,14 +368,17 @@ if df is not None and len(df) > 0:
                         name=subcat,
                         marker=dict(
                             size=10,
-                            opacity=0.7
+                            opacity=0.7,
+                            color=color_map[subcat]
                         ),
                         text=subcat_data['title'],
+                        customdata=subcat_data['project_url'] if 'project_url' in subcat_data.columns else None,
                         hovertemplate='<b>%{text}</b><br>' +
                                       'Subcategory: ' + subcat + '<br>' +
                                       'X: %{x:.3f}<br>' +
                                       'Y: %{y:.3f}<br>' +
-                                      'Z: %{z:.3f}<extra></extra>'
+                                      'Z: %{z:.3f}<br>' +
+                                      '<extra></extra>'
                     ))
             
             # Add other projects as gray dots
@@ -366,14 +396,16 @@ if df is not None and len(df) > 0:
                         color='gray'
                     ),
                     text=other_data['title'],
+                    customdata=other_data['project_url'] if 'project_url' in other_data.columns else None,
                     hovertemplate='<b>%{text}</b><br>' +
                                   'X: %{x:.3f}<br>' +
                                   'Y: %{y:.3f}<br>' +
-                                  'Z: %{z:.3f}<extra></extra>'
+                                  'Z: %{z:.3f}<br>' +
+                                  '<extra></extra>'
                 ))
             
             fig_3d.update_layout(
-                title='3D Project Space - Subcategory Groups',
+                title='3D Project Space - Subcategory Groups (Click points to visit project websites)',
                 scene=dict(
                     xaxis_title='UMAP Dimension 1',
                     yaxis_title='UMAP Dimension 2',
@@ -402,15 +434,17 @@ if df is not None and len(df) > 0:
                     colorbar=dict(title="Distance from Origin")
                 ),
                 text=filtered_df['title'],
+                customdata=filtered_df['project_url'] if 'project_url' in filtered_df.columns else None,
                 hovertemplate='<b>%{text}</b><br>' +
                               'Distance: %{marker.color:.3f}<br>' +
                               'X: %{x:.3f}<br>' +
                               'Y: %{y:.3f}<br>' +
-                              'Z: %{z:.3f}<extra></extra>'
+                              'Z: %{z:.3f}<br>' +
+                              '<extra></extra>'
             )])
             
             fig_3d.update_layout(
-                title='3D Project Space - Distance from Origin',
+                title='3D Project Space - Distance from Origin (Click points to visit project websites)',
                 scene=dict(
                     xaxis_title='UMAP Dimension 1',
                     yaxis_title='UMAP Dimension 2',
@@ -433,6 +467,11 @@ if df is not None and len(df) > 0:
                 color_data = filtered_df['subcategory_1']
                 color_title = "Subcategory"
             
+            # Create numeric color mapping
+            unique_values = color_data.unique()
+            color_indices = {val: idx for idx, val in enumerate(unique_values)}
+            numeric_colors = [color_indices[val] for val in color_data]
+            
             fig_3d = go.Figure(data=[go.Scatter3d(
                 x=filtered_df['x'],
                 y=filtered_df['y'],
@@ -440,21 +479,23 @@ if df is not None and len(df) > 0:
                 mode='markers',
                 marker=dict(
                     size=10,
-                    color=color_data,
+                    color=numeric_colors,
                     colorscale='Viridis',
                     opacity=0.8,
                     colorbar=dict(title=color_title)
                 ),
                 text=filtered_df['title'],
+                customdata=filtered_df['project_url'] if 'project_url' in filtered_df.columns else None,
                 hovertemplate='<b>%{text}</b><br>' +
-                              color_title + ': %{marker.color}<br>' +
+                              color_title + ': %{customdata}<br>' +
                               'X: %{x:.3f}<br>' +
                               'Y: %{y:.3f}<br>' +
-                              'Z: %{z:.3f}<extra></extra>'
+                              'Z: %{z:.3f}<br>' +
+                              '<extra></extra>'
             )])
             
             fig_3d.update_layout(
-                title=f'Interactive 3D Project Space - Colored by {color_title}',
+                title=f'Interactive 3D Project Space - Colored by {color_title} (Click points to visit project websites)',
                 scene=dict(
                     xaxis_title='UMAP Dimension 1',
                     yaxis_title='UMAP Dimension 2',
@@ -466,13 +507,31 @@ if df is not None and len(df) > 0:
             )
             st.plotly_chart(fig_3d, use_container_width=True)
         
-        # 3D plot controls
+        # 3D plot controls and click instructions
         st.markdown("**3D Plot Controls:**")
         st.markdown("- **Rotate:** Click and drag to rotate the view")
         st.markdown("- **Zoom:** Scroll to zoom in/out")
         st.markdown("- **Pan:** Right-click and drag to pan")
         st.markdown("- **Reset:** Double-click to reset the view")
         st.markdown("- **Hover:** Hover over points to see project details")
+        st.markdown("- **🖱️ Click:** Click on any data point to visit the project website!")
+        
+        # Project links section
+        if 'project_url' in filtered_df.columns:
+            st.markdown("---")
+            st.subheader("🔗 Quick Project Links")
+            st.markdown("Click on any project below to visit its website:")
+            
+            # Display project links in a grid
+            col1, col2, col3 = st.columns(3)
+            for idx, (_, row) in enumerate(filtered_df.iterrows()):
+                if pd.notna(row['project_url']) and row['project_url'] != '':
+                    with [col1, col2, col3][idx % 3]:
+                        st.markdown(
+                            f"<a href='{row['project_url']}' target='_blank' class='project-link'>"
+                            f"🌐 {row['title'][:30]}{'...' if len(row['title']) > 30 else ''}</a>",
+                            unsafe_allow_html=True
+                        )
     
     # 2D UMAP Projections
     if all(col in filtered_df.columns for col in ['x', 'y']):
@@ -521,13 +580,31 @@ if df is not None and len(df) > 0:
     else:
         display_df = filtered_df
     
-    # Display projects table
+    # Display projects table with clickable links
     if 'title' in display_df.columns:
-        st.dataframe(
-            display_df[['title', 'category', 'subcategory_1'] if 'subcategory_1' in display_df.columns else ['title', 'category']],
-            use_container_width=True,
-            hide_index=True
-        )
+        st.markdown("**Click on project names to visit their websites:**")
+        
+        # Create a custom display with clickable links
+        for idx, (_, row) in enumerate(display_df.iterrows()):
+            with st.expander(f"📁 {row['title']}"):
+                col1, col2 = st.columns([2, 1])
+                
+                with col1:
+                    st.write(f"**Category:** {row.get('category', 'N/A')}")
+                    if 'subcategory_1' in row and pd.notna(row['subcategory_1']) and row['subcategory_1'] != '':
+                        st.write(f"**Subcategory:** {row['subcategory_1']}")
+                    if 'description' in row and pd.notna(row['description']):
+                        st.write(f"**Description:** {row['description'][:200]}{'...' if len(str(row['description'])) > 200 else ''}")
+                
+                with col2:
+                    if 'project_url' in row and pd.notna(row['project_url']) and row['project_url'] != '':
+                        st.markdown(
+                            f"<a href='{row['project_url']}' target='_blank' class='project-link'>"
+                            f"🌐 Visit Project Website</a>",
+                            unsafe_allow_html=True
+                        )
+                    else:
+                        st.write("❌ No URL available")
     
     # Export functionality
     st.markdown("---")
@@ -582,6 +659,7 @@ else:
     1. **Upload your CSV file** using the file uploader above
     2. **Explore categories** and subcategories in the sidebar filters
     3. **View 3D visualizations** with different coloring options
-    4. **Search projects** by name or description
-    5. **Export filtered data** for further analysis
+    4. **Click on data points** to visit project websites
+    5. **Search projects** by name or description
+    6. **Export filtered data** for further analysis
     """)
