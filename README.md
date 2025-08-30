@@ -257,7 +257,7 @@ cd project-explorer-pro
 pip install -r requirements.txt
 
 # Run the application
-streamlit run streamlit_app_enhanced.py --server.port 8512
+streamlit run streamlit_app_production.py --server.port 8512
 ```
 
 ### Configuration

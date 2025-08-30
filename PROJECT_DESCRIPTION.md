@@ -25,7 +25,7 @@ Project Explorer Pro is a cutting-edge AI-powered platform that revolutionizes p
 git clone https://github.com/ecanbaykurt/project-explorer-3d.git
 cd project-explorer-3d
 pip install -r requirements.txt
-streamlit run streamlit_app_enhanced.py --server.port 8512
+streamlit run streamlit_app_production.py --server.port 8512
 ```
 
 ## 💡 Use Cases

@@ -47,7 +47,7 @@ jobs:
         echo 'git clone https://github.com/ecanbaykurt/project-explorer-3d.git' >> docs/index.md
         echo 'cd project-explorer-3d' >> docs/index.md
         echo 'pip install -r requirements.txt' >> docs/index.md
-        echo 'streamlit run streamlit_app_enhanced.py --server.port 8512' >> docs/index.md
+        echo 'streamlit run streamlit_app_production.py --server.port 8512' >> docs/index.md
         echo '```' >> docs/index.md
         
     - name: Deploy to GitHub Pages
