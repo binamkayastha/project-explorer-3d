@@ -5,21 +5,33 @@ import plotly.graph_objects as go
 import numpy as np
 from datetime import datetime
 import re
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-import nltk
-from nltk.corpus import stopwords
 import string
 
-# NLTK data downloads (with error handling)
+# Try to import optional dependencies
 try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    SKLEARN_AVAILABLE = True
+except ImportError:
+    SKLEARN_AVAILABLE = False
+    st.warning("⚠️ scikit-learn not available. AI matching features will be disabled.")
+
 try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
+    import nltk
+    from nltk.corpus import stopwords
+    NLTK_AVAILABLE = True
+    # NLTK data downloads (with error handling)
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt')
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        nltk.download('stopwords')
+except ImportError:
+    NLTK_AVAILABLE = False
+    st.warning("⚠️ NLTK not available. Text processing features will be limited.")
 
 # Page config
 st.set_page_config(
@@ -116,19 +128,19 @@ st.markdown("""
 
 # File upload section
 st.markdown("---")
-st.markdown("### 📁 Upload Your Sundai Projects CSV File")
-st.markdown("Upload your `sundai_projects_umap.csv` file to explore the 3D project space")
+st.markdown("### 📁 Upload Your Project CSV File")
+st.markdown("Upload your project data file to explore the 3D project space")
 
 uploaded_file = st.file_uploader(
-    "Choose sundai_projects_umap.csv",
+    "Choose your CSV file",
     type=['csv'],
-    help="Upload your Sundai projects dataset with UMAP coordinates"
+    help="Upload your projects dataset"
 )
 
 # Load data function with duplicate column handling
 @st.cache_data
-def load_sundai_data(uploaded_file):
-    """Load Sundai projects data with proper column mapping and duplicate handling"""
+def load_project_data(uploaded_file):
+    """Load project data with proper column mapping and duplicate handling"""
     if uploaded_file is not None:
         try:
             df = pd.read_csv(uploaded_file)
@@ -179,7 +191,7 @@ def load_sundai_data(uploaded_file):
                 if col in df.columns:
                     df[col] = df[col].fillna('')
             
-            st.success(f"✅ Successfully loaded {len(df)} Sundai projects!")
+            st.success(f"✅ Successfully loaded {len(df)} projects!")
             return df
             
         except Exception as e:
@@ -187,7 +199,7 @@ def load_sundai_data(uploaded_file):
             return None
     return None
 
-# AI Chatbot functions
+# AI Chatbot functions (only if dependencies available)
 def preprocess_text(text):
     """Preprocess text for similarity matching"""
     if pd.isna(text) or text == '':
@@ -199,15 +211,17 @@ def preprocess_text(text):
     # Remove punctuation
     text = text.translate(str.maketrans('', '', string.punctuation))
     
-    # Simple tokenization (avoid NLTK issues)
+    # Simple tokenization
     tokens = text.split()
     
-    # Remove stopwords
-    try:
-        stop_words = set(stopwords.words('english'))
-        tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
-    except:
-        # Fallback if stopwords not available
+    # Remove stopwords if NLTK is available
+    if NLTK_AVAILABLE:
+        try:
+            stop_words = set(stopwords.words('english'))
+            tokens = [token for token in tokens if token not in stop_words and len(token) > 2]
+        except:
+            tokens = [token for token in tokens if len(token) > 2]
+    else:
         tokens = [token for token in tokens if len(token) > 2]
     
     return ' '.join(tokens)
@@ -240,19 +254,23 @@ def find_similar_projects(user_query, df, top_k=3):
     if df is None or len(df) == 0:
         return []
     
-    # Preprocess user query
-    processed_query = preprocess_text(user_query)
+    if not SKLEARN_AVAILABLE:
+        st.error("❌ AI matching not available. Please install scikit-learn: pip install scikit-learn")
+        return []
     
-    # Create combined text for each project
-    project_texts = []
-    for _, row in df.iterrows():
-        combined_text = f"{row.get('title', '')} {row.get('description', '')} {row.get('category', '')} {row.get('subcategory_1', '')} {row.get('subcategory_2', '')} {row.get('subcategory_3', '')}"
-        processed_text = preprocess_text(combined_text)
-        project_texts.append(processed_text)
-    
-    # Create TF-IDF vectors
-    vectorizer = TfidfVectorizer(max_features=1000, ngram_range=(1, 2))
     try:
+        # Preprocess user query
+        processed_query = preprocess_text(user_query)
+        
+        # Create combined text for each project
+        project_texts = []
+        for _, row in df.iterrows():
+            combined_text = f"{row.get('title', '')} {row.get('description', '')} {row.get('category', '')} {row.get('subcategory_1', '')} {row.get('subcategory_2', '')} {row.get('subcategory_3', '')}"
+            processed_text = preprocess_text(combined_text)
+            project_texts.append(processed_text)
+        
+        # Create TF-IDF vectors
+        vectorizer = TfidfVectorizer(max_features=1000, ngram_range=(1, 2))
         tfidf_matrix = vectorizer.fit_transform(project_texts)
         query_vector = vectorizer.transform([processed_query])
         
@@ -285,7 +303,7 @@ def find_similar_projects(user_query, df, top_k=3):
         return []
 
 # Load data
-df = load_sundai_data(uploaded_file)
+df = load_project_data(uploaded_file)
 
 if df is not None and len(df) > 0:
     # Google-style Landing Page
@@ -454,7 +472,7 @@ if df is not None and len(df) > 0:
                 st.warning("Please describe your project idea to find similar projects.")
 
 else:
-    st.warning("⚠️ Please upload your `sundai_projects_umap.csv` file to see the analytics dashboard.")
+    st.warning("⚠️ Please upload your project CSV file to see the analytics dashboard.")
     
     # Show expected format
     st.markdown("### 📋 Expected CSV Format")
@@ -625,3 +643,6 @@ else:
         
         except Exception as e:
             st.error(f"❌ Error processing file: {str(e)}")
+            st.error(f"Error type: {type(e).__name__}")
+            import traceback
+            st.code(traceback.format_exc())
