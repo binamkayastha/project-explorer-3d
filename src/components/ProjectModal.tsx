@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ExternalLink, Github, Star, Calendar, Users, Code, Zap, Shield, AlertTriangle, BookOpen, Settings, TrendingUp } from 'lucide-react'
+import { X, ExternalLink, Github, Star, Calendar, Users, Code, Shield, AlertTriangle, BookOpen, TrendingUp } from 'lucide-react'
 import { Project } from '@/utils/dataLoader'
 import { useState } from 'react'
 

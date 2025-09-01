@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { 
   BarChart3, 
-  Sparkles, 
   TrendingUp, 
   Database, 
   Star, 
@@ -13,12 +12,7 @@ import {
   CheckCircle,
   ArrowUp,
   ArrowDown,
-  Calendar,
-  Globe,
-  Code,
-  Server,
-  Brain,
-  Cloud
+  Calendar
 } from 'lucide-react'
 import { dataLoader, AnalyticsData } from '@/utils/dataLoader'
 import { AnalyticsCharts } from '@/components/AnalyticsCharts'
@@ -90,46 +84,7 @@ const Analytics = () => {
     </motion.div>
   )
 
-  const TechnologyChart = ({ 
-    data, 
-    title, 
-    icon: Icon 
-  }: {
-    data: { name: string; count: number; percentage: number }[]
-    title: string
-    icon: any
-  }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="glass-card p-6"
-    >
-      <div className="flex items-center space-x-2 mb-6">
-        <Icon className="w-5 h-5 text-primary-400" />
-        <h3 className="text-lg font-semibold text-white">{title}</h3>
-      </div>
-      
-      <div className="space-y-4">
-        {data.slice(0, 8).map((item, index) => (
-          <div key={item.name} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-300">{item.name}</span>
-              <span className="text-sm text-gray-400">{item.count} projects</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-primary-500 to-sundai-500 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${item.percentage}%` }}
-              />
-            </div>
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>{item.percentage}% of projects</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </motion.div>
-  )
+
 
   const CategoryCard = ({ 
     name, 
@@ -334,7 +289,7 @@ const Analytics = () => {
               <div>
                 <h2 className="text-2xl font-bold text-white mb-6">Project Categories</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {analyticsData.projectStats.topCategories.map((category, index) => (
+                  {analyticsData.projectStats.topCategories.map((category) => (
                     <CategoryCard
                       key={category.name}
                       name={category.name}

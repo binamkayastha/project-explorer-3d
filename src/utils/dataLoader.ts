@@ -41,7 +41,7 @@ export interface SearchFilters {
   aiModels: string[]
   categories: string[]
   minStars: number
-  maxStars: number
+  maxStars?: number
 }
 
 export interface IdeaAnalysis {
@@ -107,7 +107,7 @@ class DataLoader {
       const result = Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
-        transform: (value, field) => {
+        transform: (value) => {
           // Clean up the data
           if (typeof value === 'string') {
             value = value.trim()
@@ -160,7 +160,14 @@ class DataLoader {
   }
 
   // Enhanced search with better similarity scoring
-  async searchProjects(query: string, filters: SearchFilters = {}): Promise<Project[]> {
+  async searchProjects(query: string, filters: SearchFilters = {
+    technologies: [],
+    frameworks: [],
+    aiModels: [],
+    categories: [],
+    minStars: 0,
+    maxStars: undefined
+  }): Promise<Project[]> {
     const projects = await this.loadProjects()
     
     if (!query.trim() && Object.keys(filters).length === 0) {

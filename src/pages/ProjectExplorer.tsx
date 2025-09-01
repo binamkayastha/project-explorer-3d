@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import { 
   Sparkles, 
   Lightbulb, 
@@ -7,14 +7,11 @@ import {
   Zap, 
   Clock, 
   Code, 
-  Database, 
   Users, 
   Star, 
-  ArrowRight,
   CheckCircle,
   AlertCircle,
   TrendingUp,
-  Link,
   Copy,
   ExternalLink,
   Box

@@ -10,7 +10,7 @@ import {
   Zap, 
   Target,
   Users,
-  TrendingUp
+
 } from 'lucide-react'
 
 const Home = () => {

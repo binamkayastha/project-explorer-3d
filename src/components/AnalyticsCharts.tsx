@@ -59,7 +59,7 @@ export const TechnologyPieChart = ({ data, title }: { data: ChartData[], title: 
           fill="#8884d8"
           dataKey="count"
         >
-          {data.slice(0, 6).map((entry, index) => (
+          {data.slice(0, 6).map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
@@ -77,7 +77,7 @@ export const TechnologyPieChart = ({ data, title }: { data: ChartData[], title: 
 )
 
 export const TrendLineChart = ({ data, title }: { data: ChartData[], title: string }) => {
-  const trendData = data.slice(0, 8).map((item, index) => ({
+  const trendData = data.slice(0, 8).map((item) => ({
     name: item.name,
     adoption: item.percentage,
     projects: item.count

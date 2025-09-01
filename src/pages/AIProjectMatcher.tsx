@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Filter, Sparkles, Database, TrendingUp, Star, Users, Zap } from 'lucide-react'
+import { Search, Filter, Sparkles, Database, Star, Users, Zap } from 'lucide-react'
 import { dataLoader, Project, SearchFilters } from '@/utils/dataLoader'
 import ProjectCard from '@/components/ProjectCard'
 import ProjectModal from '@/components/ProjectModal'
 import toast from 'react-hot-toast'
 
 const AIProjectMatcher = () => {
-  const [projects, setProjects] = useState<Project[]>([])
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState<SearchFilters>({
@@ -39,7 +38,6 @@ const AIProjectMatcher = () => {
         dataLoader.loadProjects(),
         dataLoader.getProjectStats()
       ])
-      setProjects(projectsData)
       setFilteredProjects(projectsData)
       setStats(statsData)
     } catch (error) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { 
   Star,
@@ -6,7 +6,7 @@ import {
   Target,
   Sparkles
 } from 'lucide-react'
-import { Project, IdeaAnalysis, ProjectMatch } from '@/utils/dataLoader'
+import { IdeaAnalysis, ProjectMatch } from '@/utils/dataLoader'
 
 interface ThreeDIdeaVisualizerProps {
   ideaAnalysis: IdeaAnalysis | null
@@ -143,7 +143,7 @@ const ThreeDIdeaVisualizer = ({
                   {!isIdea && (
                     <div className="text-center mt-1">
                       <span className="text-xs text-primary-400 font-bold">
-                        {node.similarity}% match
+                        {'similarity' in node ? `${node.similarity}% match` : 'Match'}
                       </span>
                     </div>
                   )}
@@ -154,10 +154,10 @@ const ThreeDIdeaVisualizer = ({
                   <div className="bg-dark-700 text-white p-3 rounded-lg shadow-xl max-w-xs">
                     <h4 className="font-semibold text-sm mb-1">{node.name}</h4>
                     {isIdea ? (
-                      <p className="text-xs text-gray-300">{node.category}</p>
+                      <p className="text-xs text-gray-300">{'category' in node ? node.category : 'AI Project'}</p>
                     ) : (
                       <p className="text-xs text-gray-300 line-clamp-2">
-                        {node.data.description}
+                        {node.data && 'description' in node.data ? node.data.description : 'No description available'}
                       </p>
                     )}
                   </div>
