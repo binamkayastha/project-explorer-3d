@@ -1,29 +1,43 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Streamlit from "./pages/Streamlit";
-import NotFound from "./pages/NotFound";
+import React from 'react'
+import { Routes, Route } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useLocation } from 'react-router-dom'
+import Navbar from './components/Navbar'
+import Footer from './components/Footer'
+import Home from './pages/Home'
+import AIProjectMatcher from './pages/AIProjectMatcher'
+import ProjectExplorer from './pages/ProjectExplorer'
+import Analytics from './pages/Analytics'
+import { ThemeProvider } from './contexts/ThemeContext'
 
-const queryClient = new QueryClient();
+function App() {
+  const location = useLocation()
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/streamlit" element={<Streamlit />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+  return (
+    <ThemeProvider>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-dark-900 dark:via-dark-800 dark:to-dark-900">
+        <Navbar />
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={location.pathname}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="container mx-auto px-4 py-8"
+          >
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/ai-matcher" element={<AIProjectMatcher />} />
+              <Route path="/explorer" element={<ProjectExplorer />} />
+              <Route path="/analytics" element={<Analytics />} />
+            </Routes>
+          </motion.main>
+        </AnimatePresence>
+        <Footer />
+      </div>
+    </ThemeProvider>
+  )
+}
 
-export default App;
+export default App
