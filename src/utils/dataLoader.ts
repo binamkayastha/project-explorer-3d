@@ -1,6 +1,7 @@
 
 
 import Papa from 'papaparse'
+import { ragClient, RAGProjectMatch } from './ragClient'
 
 export interface Project {
   id: number
@@ -337,6 +338,65 @@ class DataLoader {
     return scoredProjects
       .sort((a, b) => b.similarityScore - a.similarityScore)
       .slice(0, limit)
+  }
+
+  // New: RAG-based similarity search using Python service
+  async findSimilarProjectsRAG(userIdea: string, limit: number = 5): Promise<ProjectMatch[]> {
+    try {
+      // Check if RAG service is available
+      const isHealthy = await ragClient.healthCheck()
+      if (!isHealthy) {
+        console.warn('RAG service not available, falling back to traditional search')
+        return this.findSimilarProjects(userIdea, limit)
+      }
+
+      // Use RAG service
+      const ragMatches = await ragClient.findSimilarProjects(userIdea, limit)
+      
+      // Convert RAG matches to ProjectMatch format
+      const projectMatches: ProjectMatch[] = ragMatches.map(ragMatch => ({
+        project: {
+          id: ragMatch.id,
+          name: ragMatch.name,
+          description: ragMatch.description,
+          project_url: ragMatch.project_url,
+          demo_url: ragMatch.demo_url,
+          github_url: ragMatch.github_url,
+          detailed_description: ragMatch.description,
+          ai_summary: ragMatch.ai_summary,
+          architecture: '',
+          components_list: '',
+          dependencies_list: '',
+          features_list: '',
+          technologies_list: '',
+          github_stars: ragMatch.github_stars,
+          repo_license: '',
+          contributors: '',
+          ai_models_inferred: '',
+          vector_db_inferred: '',
+          frameworks_inferred: '',
+          infrastructure_inferred: '',
+          top_risks: '',
+          setup_steps: '',
+          integration_plan: '',
+          deployment_notes: '',
+          security_notes: '',
+          testing_notes: '',
+          api_endpoints_list: '',
+          env_vars_list: '',
+          services_list: '',
+          date: ''
+        },
+        similarityScore: ragMatch.similarity_score,
+        matchReason: ragMatch.match_reason,
+        integrationComplexity: ragMatch.integration_complexity as 'low' | 'medium' | 'high'
+      }))
+
+      return projectMatches
+    } catch (error) {
+      console.error('RAG search failed, falling back to traditional search:', error)
+      return this.findSimilarProjects(userIdea, limit)
+    }
   }
 
   // New: Suggest system combinations

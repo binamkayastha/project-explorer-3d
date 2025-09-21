@@ -37,6 +37,7 @@ const ProjectExplorer = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [activeTab, setActiveTab] = useState<'analysis' | 'matches' | 'combinations' | '3d'>('analysis')
+  const [useRAGSearch, setUseRAGSearch] = useState(true)
 
   const handleAnalyzeIdea = async () => {
     if (!userIdea.trim()) {
@@ -47,7 +48,11 @@ const ProjectExplorer = () => {
     setIsAnalyzing(true)
     try {
       const analysis = await dataLoader.analyzeUserIdea(userIdea)
-      const matches = await dataLoader.findSimilarProjects(userIdea, 5)
+      
+      // Use RAG search if enabled, otherwise use traditional
+      const matches = useRAGSearch 
+        ? await dataLoader.findSimilarProjectsRAG(userIdea, 5)
+        : await dataLoader.findSimilarProjects(userIdea, 5)
       
       setIdeaAnalysis(analysis)
       setProjectMatches(matches)
@@ -58,7 +63,7 @@ const ProjectExplorer = () => {
         setSystemCombinations(combinations)
       }
       
-      toast.success('Idea analyzed successfully!')
+      toast.success(`Found ${matches.length} similar projects using ${useRAGSearch ? 'RAG' : 'traditional'} search!`)
     } catch (error) {
       console.error('Error analyzing idea:', error)
       toast.error('Failed to analyze idea')
@@ -133,6 +138,42 @@ const ProjectExplorer = () => {
             </div>
             
             <div className="space-y-4">
+              {/* RAG Toggle */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm text-gray-400">Search Method:</span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => setUseRAGSearch(true)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                        useRAGSearch
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-white/10 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      🧠 RAG Search
+                    </button>
+                    <button
+                      onClick={() => setUseRAGSearch(false)}
+                      className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
+                        !useRAGSearch
+                          ? 'bg-primary-500 text-white'
+                          : 'bg-white/10 text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      🔍 Traditional
+                    </button>
+                  </div>
+                </div>
+                
+                {useRAGSearch && (
+                  <div className="flex items-center space-x-2 text-xs text-primary-400">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Using AI Summary semantic analysis</span>
+                  </div>
+                )}
+              </div>
+
               <textarea
                 value={userIdea}
                 onChange={(e) => setUserIdea(e.target.value)}
@@ -155,7 +196,7 @@ const ProjectExplorer = () => {
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      <span>Analyze Idea</span>
+                      <span>Analyze with {useRAGSearch ? 'RAG' : 'Traditional'} Search</span>
                     </>
                   )}
                 </button>
