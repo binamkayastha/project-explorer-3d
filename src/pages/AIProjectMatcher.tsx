@@ -132,24 +132,24 @@ const AIProjectMatcher = () => {
                 className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12"
               >
                 <div className="glass-card p-6 text-center">
-                  <Database className="w-8 h-8 text-primary-400 mx-auto mb-2" />
-                                     <div className="text-2xl font-bold text-white">{stats.totalProjects}</div>
-                   <div className="text-gray-300">Total Projects</div>
-                 </div>
-                 <div className="glass-card p-6 text-center">
-                   <Star className="w-8 h-8 text-sundai-400 mx-auto mb-2" />
-                   <div className="text-2xl font-bold text-white">{stats.totalStars}</div>
-                   <div className="text-gray-300">Total Stars</div>
-                 </div>
-                 <div className="glass-card p-6 text-center">
-                   <Users className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                   <div className="text-2xl font-bold text-white">{stats.avgStars}</div>
-                   <div className="text-gray-300">Avg Stars</div>
-                 </div>
-                 <div className="glass-card p-6 text-center">
-                   <Zap className="w-8 h-8 text-purple-400 mx-auto mb-2" />
-                   <div className="text-2xl font-bold text-white">{stats.topTechnologies.length}</div>
-                   <div className="text-gray-300">Technologies</div>
+                  <Database className="w-8 h-8 text-primary-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-dark-900 dark:text-white">{stats.totalProjects}</div>
+                  <div className="text-dark-600 dark:text-gray-300">Total Projects</div>
+                </div>
+                <div className="glass-card p-6 text-center">
+                  <Star className="w-8 h-8 text-sundai-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-dark-900 dark:text-white">{stats.totalStars}</div>
+                  <div className="text-dark-600 dark:text-gray-300">Total Stars</div>
+                </div>
+                <div className="glass-card p-6 text-center">
+                  <Users className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-dark-900 dark:text-white">{stats.avgStars}</div>
+                  <div className="text-dark-600 dark:text-gray-300">Avg Stars</div>
+                </div>
+                <div className="glass-card p-6 text-center">
+                  <Zap className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                  <div className="text-2xl font-bold text-dark-900 dark:text-white">{stats.topTechnologies.length}</div>
+                  <div className="text-dark-600 dark:text-gray-300">Technologies</div>
                 </div>
               </motion.div>
             )}
@@ -164,18 +164,18 @@ const AIProjectMatcher = () => {
             {/* Search Bar */}
             <div className="flex items-center space-x-4 mb-6">
               <div className="flex-1 relative">
-                                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                 <input
-                   type="text"
-                   placeholder="Search projects by name, description, technologies..."
-                   value={searchQuery}
-                   onChange={(e) => setSearchQuery(e.target.value)}
-                   className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                 />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-300" />
+                <input
+                  type="text"
+                  placeholder="Search projects by name, description, technologies..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 bg-dark-800 border border-dark-500 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center space-x-2 px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white hover:bg-white/20 transition-colors"
+                className="flex items-center space-x-2 px-4 py-3 bg-dark-800 border border-dark-500 rounded-xl text-white hover:bg-dark-700 transition-colors"
               >
                 <Filter className="w-5 h-5" />
                 <span>Filters</span>
@@ -194,7 +194,7 @@ const AIProjectMatcher = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pt-6 border-t border-white/20">
                     {/* Technology Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-dark-900 dark:text-white mb-2">
                         Technologies
                       </label>
                       <select
@@ -204,10 +204,10 @@ const AIProjectMatcher = () => {
                           const values = Array.from(e.target.selectedOptions, option => option.value)
                           handleFilterChange('technologies', values)
                         }}
-                        className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full p-3 bg-dark-800 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       >
                         {stats?.topTechnologies.map((tech: string) => (
-                          <option key={tech} value={tech} className="bg-dark-800">
+                          <option key={tech} value={tech} className="bg-dark-900">
                             {tech}
                           </option>
                         ))}
@@ -216,7 +216,7 @@ const AIProjectMatcher = () => {
 
                     {/* Framework Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-dark-900 dark:text-white mb-2">
                         Frameworks
                       </label>
                       <select
@@ -226,10 +226,10 @@ const AIProjectMatcher = () => {
                           const values = Array.from(e.target.selectedOptions, option => option.value)
                           handleFilterChange('frameworks', values)
                         }}
-                        className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full p-3 bg-dark-800 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       >
                         {stats?.topFrameworks.map((framework: string) => (
-                          <option key={framework} value={framework} className="bg-dark-800">
+                          <option key={framework} value={framework} className="bg-dark-900">
                             {framework}
                           </option>
                         ))}
@@ -238,7 +238,7 @@ const AIProjectMatcher = () => {
 
                     {/* AI Models Filter */}
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-dark-900 dark:text-white mb-2">
                         AI Models
                       </label>
                       <select
@@ -248,10 +248,10 @@ const AIProjectMatcher = () => {
                           const values = Array.from(e.target.selectedOptions, option => option.value)
                           handleFilterChange('aiModels', values)
                         }}
-                        className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full p-3 bg-dark-800 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                       >
                         {stats?.topAIModels.map((model: string) => (
-                          <option key={model} value={model} className="bg-dark-800">
+                          <option key={model} value={model} className="bg-dark-900">
                             {model}
                           </option>
                         ))}
@@ -260,27 +260,27 @@ const AIProjectMatcher = () => {
 
                     {/* Stars Range */}
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-dark-900 dark:text-white mb-2">
                         Min Stars
                       </label>
                       <input
                         type="number"
                         value={filters.minStars || ''}
                         onChange={(e) => handleFilterChange('minStars', parseInt(e.target.value) || 0)}
-                        className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full p-3 bg-dark-800 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="0"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-white mb-2">
+                      <label className="block text-sm font-medium text-dark-900 dark:text-white mb-2">
                         Max Stars
                       </label>
                       <input
                         type="number"
                         value={filters.maxStars || ''}
                         onChange={(e) => handleFilterChange('maxStars', parseInt(e.target.value) || 0)}
-                        className="w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                        className="w-full p-3 bg-dark-800 border border-dark-500 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                         placeholder="∞"
                       />
                     </div>
@@ -288,7 +288,7 @@ const AIProjectMatcher = () => {
                     <div className="flex items-end">
                       <button
                         onClick={clearFilters}
-                        className="w-full px-4 py-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 hover:bg-red-500/30 transition-colors"
+                        className="w-full px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors"
                       >
                         Clear Filters
                       </button>
@@ -353,11 +353,11 @@ const AIProjectMatcher = () => {
               className="text-center py-12"
             >
               <div className="glass-card p-8 max-w-md mx-auto">
-                                 <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                 <h3 className="text-xl font-semibold text-white mb-2">No projects found</h3>
-                 <p className="text-gray-300 mb-4">
-                   Try adjusting your search terms or filters to find more projects.
-                 </p>
+                <Search className="w-16 h-16 text-primary-600 dark:text-primary-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-dark-900 dark:text-white mb-2">No projects found</h3>
+                <p className="text-dark-700 dark:text-gray-300 mb-4">
+                  Try adjusting your search terms or filters to find more projects.
+                </p>
                 <button
                   onClick={clearFilters}
                   className="btn-primary"

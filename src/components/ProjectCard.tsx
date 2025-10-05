@@ -139,7 +139,7 @@ const ProjectCard = ({ project, onClick, className = '' }: ProjectCardProps) => 
       )}
 
       {/* Links */}
-      <div className="flex items-center space-x-3 pt-4 border-t border-white/20">
+      <div className="flex items-center space-x-3 pt-4 border-t border-dark-100 dark:border-white/10">
         {project.github_url && (
           <a
             href={project.github_url}

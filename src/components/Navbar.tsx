@@ -37,7 +37,7 @@ const Navbar = () => {
     >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center space-x-3 group">
+          <Link to="/" className="flex items-center space-x-3 group" aria-label="Sundai AI Explorer home">
             <motion.div
               whileHover={{ rotate: 360 }}
               transition={{ duration: 0.6 }}
@@ -60,7 +60,7 @@ const Navbar = () => {
             </div>
           </Link>
 
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-1" role="navigation" aria-label="Main">
             {navItems.map((item) => {
               const Icon = item.icon
               const isActive = location.pathname === item.path
@@ -70,16 +70,17 @@ const Navbar = () => {
                   to={item.path}
                   className={`relative flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 group ${
                     isActive
-                      ? 'bg-primary-500/20 text-primary-600 dark:text-primary-400'
-                      : 'text-dark-600 dark:text-dark-300 hover:text-primary-600 dark:hover:text-primary-400'
+                      ? 'bg-primary-600 text-white shadow-md dark:bg-primary-500/80'
+                      : 'text-dark-800 hover:text-primary-700 dark:text-dark-50 dark:hover:text-primary-300'
                   }`}
+                  aria-current={isActive ? 'page' : undefined}
                 >
                   <Icon className="w-4 h-4" />
                   <span className="font-medium">{item.label}</span>
                   {isActive && (
                     <motion.div
                       layoutId="activeTab"
-                      className="absolute inset-0 bg-primary-500/10 rounded-xl"
+                      className="absolute inset-0 rounded-xl bg-primary-600/40 dark:bg-primary-500/40"
                       initial={false}
                       transition={{ type: "spring", stiffness: 500, damping: 30 }}
                     />
@@ -92,18 +93,22 @@ const Navbar = () => {
           <div className="flex items-center space-x-3">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+              className="p-2 rounded-xl bg-white text-dark-900 border border-white/40 hover:bg-primary-50 transition-all duration-300 dark:bg-dark-700 dark:text-white dark:border-dark-500"
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
             >
               {theme === 'light' ? (
-                <Moon className="w-5 h-5 text-dark-600" />
+                <Moon className="w-5 h-5 text-dark-700" />
               ) : (
-                <Sun className="w-5 h-5 text-dark-300" />
+                <Sun className="w-5 h-5 text-amber-300" />
               )}
             </button>
 
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="md:hidden p-2 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+              className="md:hidden p-2 rounded-xl bg-white text-dark-900 border border-white/40 hover:bg-primary-50 transition-all duration-300 dark:bg-dark-700 dark:text-white dark:border-dark-500"
+              aria-expanded={isOpen}
+              aria-controls="mobile-nav"
+              aria-label="Toggle navigation menu"
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -117,6 +122,7 @@ const Navbar = () => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden py-4 space-y-2"
+              id="mobile-nav"
             >
               {navItems.map((item) => {
                 const Icon = item.icon
@@ -127,9 +133,10 @@ const Navbar = () => {
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-300 ${
                       location.pathname === item.path
-                        ? 'bg-primary-500/20 text-primary-600 dark:text-primary-400'
-                        : 'text-dark-600 dark:text-dark-300 hover:bg-white/10'
+                        ? 'bg-primary-600 text-white shadow-md'
+                        : 'text-dark-900 hover:bg-dark-50 dark:text-dark-50 dark:hover:bg-dark-700'
                     }`}
+                    aria-current={location.pathname === item.path ? 'page' : undefined}
                   >
                     <Icon className="w-5 h-5" />
                     <span className="font-medium">{item.label}</span>

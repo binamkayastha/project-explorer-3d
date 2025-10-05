@@ -20,11 +20,11 @@
 
 @layer components {
   .glass-card {
-    @apply backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl;
+    @apply backdrop-blur-xl bg-white dark:bg-dark-800 border border-white/60 dark:border-dark-500 rounded-2xl shadow-lg text-dark-900 dark:text-gray-100;
   }
   
   .glass-card-dark {
-    @apply backdrop-blur-xl bg-dark-800/50 border border-dark-600/50 rounded-2xl;
+    @apply backdrop-blur-xl bg-dark-800 border border-dark-600 rounded-2xl shadow-lg;
   }
   
   .gradient-text {
@@ -36,11 +36,11 @@
   }
   
   .btn-primary {
-    @apply bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg;
+    @apply bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900;
   }
   
   .btn-secondary {
-    @apply bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 hover:bg-white/20 hover:border-white/30;
+    @apply bg-white text-dark-900 dark:bg-dark-700 dark:text-white font-semibold py-3 px-6 rounded-xl border border-white/70 dark:border-dark-500 transition-all duration-300 hover:bg-primary-50 hover:text-primary-700 dark:hover:bg-dark-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-dark-900;
   }
   
   .card-hover {

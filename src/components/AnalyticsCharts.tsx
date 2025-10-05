@@ -17,7 +17,7 @@ const COLORS = ['#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#06B6D4'
 
 export const TechnologyBarChart = ({ data, title }: { data: ChartData[], title: string }) => (
   <div className="glass-card p-6">
-    <h3 className="text-lg font-semibold text-white mb-6">{title}</h3>
+    <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-6">{title}</h3>
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data.slice(0, 8)}>
         <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
@@ -46,7 +46,7 @@ export const TechnologyBarChart = ({ data, title }: { data: ChartData[], title: 
 
 export const TechnologyPieChart = ({ data, title }: { data: ChartData[], title: string }) => (
   <div className="glass-card p-6">
-    <h3 className="text-lg font-semibold text-white mb-6">{title}</h3>
+    <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-6">{title}</h3>
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>
         <Pie
@@ -85,7 +85,7 @@ export const TrendLineChart = ({ data, title }: { data: ChartData[], title: stri
 
   return (
     <div className="glass-card p-6">
-      <h3 className="text-lg font-semibold text-white mb-6">{title}</h3>
+      <h3 className="text-lg font-semibold text-dark-900 dark:text-white mb-6">{title}</h3>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={trendData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />

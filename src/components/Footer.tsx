@@ -29,33 +29,33 @@ const Footer = () => {
                 href="#"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+                className="p-2 rounded-lg bg-white text-dark-700 border border-white/60 hover:bg-primary-50 hover:text-primary-700 transition-all duration-300 dark:bg-dark-700 dark:text-white dark:border-dark-500 dark:hover:bg-dark-600"
               >
-                <Github className="w-5 h-5 text-dark-600 dark:text-dark-300" />
+                <Github className="w-5 h-5" />
               </motion.a>
               <motion.a
                 href="#"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+                className="p-2 rounded-lg bg-white text-dark-700 border border-white/60 hover:bg-primary-50 hover:text-primary-700 transition-all duration-300 dark:bg-dark-700 dark:text-white dark:border-dark-500 dark:hover:bg-dark-600"
               >
-                <Twitter className="w-5 h-5 text-dark-600 dark:text-dark-300" />
+                <Twitter className="w-5 h-5" />
               </motion.a>
               <motion.a
                 href="#"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+                className="p-2 rounded-lg bg-white text-dark-700 border border-white/60 hover:bg-primary-50 hover:text-primary-700 transition-all duration-300 dark:bg-dark-700 dark:text-white dark:border-dark-500 dark:hover:bg-dark-600"
               >
-                <Linkedin className="w-5 h-5 text-dark-600 dark:text-dark-300" />
+                <Linkedin className="w-5 h-5" />
               </motion.a>
               <motion.a
                 href="#"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-all duration-300"
+                className="p-2 rounded-lg bg-white text-dark-700 border border-white/60 hover:bg-primary-50 hover:text-primary-700 transition-all duration-300 dark:bg-dark-700 dark:text-white dark:border-dark-500 dark:hover:bg-dark-600"
               >
-                <Mail className="w-5 h-5 text-dark-600 dark:text-dark-300" />
+                <Mail className="w-5 h-5" />
               </motion.a>
             </div>
           </div>

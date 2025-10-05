@@ -62,15 +62,15 @@ const Analytics = () => {
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm font-medium text-gray-400">{title}</p>
-          <p className="text-2xl font-bold text-white mt-1">{value}</p>
+          <p className="text-sm font-medium text-dark-600 dark:text-gray-400">{title}</p>
+          <p className="text-2xl font-bold text-dark-900 dark:text-white mt-1">{value}</p>
           {trend && (
             <div className="flex items-center space-x-1 mt-2">
               {trend === 'up' && <ArrowUp className="w-4 h-4 text-green-500" />}
               {trend === 'down' && <ArrowDown className="w-4 h-4 text-red-500" />}
               <span className={`text-sm font-medium ${
-                trend === 'up' ? 'text-green-500' : 
-                trend === 'down' ? 'text-red-500' : 'text-gray-400'
+                trend === 'up' ? 'text-green-600 dark:text-green-400' : 
+                trend === 'down' ? 'text-red-600 dark:text-red-400' : 'text-dark-600 dark:text-gray-400'
               }`}>
                 {trendValue}
               </span>
@@ -97,16 +97,16 @@ const Analytics = () => {
   }) => (
     <div className="glass-card p-4">
       <div className="flex items-center justify-between mb-2">
-        <h4 className="font-semibold text-white">{name}</h4>
-        <span className="text-sm text-gray-400">{count} projects</span>
+        <h4 className="font-semibold text-dark-900 dark:text-white">{name}</h4>
+        <span className="text-sm text-dark-600 dark:text-gray-400">{count} projects</span>
       </div>
-      <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+      <div className="w-full bg-dark-100 dark:bg-dark-700 rounded-full h-2 mb-2">
         <div 
           className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full"
           style={{ width: `${percentage}%` }}
         />
       </div>
-      <span className="text-xs text-gray-500">{percentage.toFixed(1)}% of total</span>
+      <span className="text-xs text-dark-500 dark:text-gray-500">{percentage.toFixed(1)}% of total</span>
     </div>
   )
 
@@ -139,14 +139,14 @@ const Analytics = () => {
           <div className={`w-8 h-8 rounded-lg ${getTypeStyles()} flex items-center justify-center`}>
             <Icon className="w-4 h-4" />
           </div>
-          <h3 className="text-lg font-semibold text-white">{title}</h3>
+          <h3 className="text-lg font-semibold text-dark-900 dark:text-white">{title}</h3>
         </div>
         
         <div className="space-y-3">
           {items.map((item, index) => (
             <div key={index} className="flex items-start space-x-2">
               <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0" />
-              <span className="text-gray-300 text-sm">{item}</span>
+              <span className="text-dark-700 dark:text-gray-300 text-sm">{item}</span>
             </div>
           ))}
         </div>
@@ -361,13 +361,13 @@ const Analytics = () => {
 
               {/* Technology Adoption Insights */}
               <div className="glass-card p-6">
-                <h3 className="text-xl font-bold text-white mb-6">Technology Adoption Insights</h3>
+                <h3 className="text-xl font-bold text-dark-900 dark:text-white mb-6">Technology Adoption Insights</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   {analyticsData.technologyTrends.frameworks.slice(0, 4).map((framework) => (
-                    <div key={framework.name} className="text-center p-4 bg-white/5 rounded-lg">
-                      <h4 className="font-semibold text-white mb-2">{framework.name}</h4>
-                      <div className="text-2xl font-bold text-primary-400 mb-1">{framework.percentage}%</div>
-                      <div className="text-sm text-gray-400">{framework.count} projects</div>
+                    <div key={framework.name} className="text-center p-4 bg-dark-50 dark:bg-dark-700 rounded-lg">
+                      <h4 className="font-semibold text-dark-900 dark:text-white mb-2">{framework.name}</h4>
+                      <div className="text-2xl font-bold text-primary-600 dark:text-primary-400 mb-1">{framework.percentage}%</div>
+                      <div className="text-sm text-dark-600 dark:text-gray-300">{framework.count} projects</div>
                     </div>
                   ))}
                 </div>
@@ -375,15 +375,15 @@ const Analytics = () => {
 
               {/* Recommendations */}
               <div className="glass-card p-6">
-                <h3 className="text-xl font-bold text-white mb-6">Strategic Recommendations</h3>
+                <h3 className="text-xl font-bold text-dark-900 dark:text-white mb-6">Strategic Recommendations</h3>
                 <div className="space-y-4">
                   <div className="flex items-start space-x-3">
                     <div className="w-8 h-8 rounded-full bg-primary-500/20 flex items-center justify-center flex-shrink-0">
                       <span className="text-primary-400 font-bold">1</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white mb-1">Focus on AI/ML Integration</h4>
-                      <p className="text-gray-300 text-sm">
+                      <h4 className="font-semibold text-dark-900 dark:text-white mb-1">Focus on AI/ML Integration</h4>
+                      <p className="text-dark-700 dark:text-gray-300 text-sm">
                         With {analyticsData.technologyTrends.aiModels[0]?.percentage}% of projects using AI models, 
                         integrating AI capabilities can significantly increase project adoption.
                       </p>
@@ -395,8 +395,8 @@ const Analytics = () => {
                       <span className="text-sundai-400 font-bold">2</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white mb-1">Leverage Modern Frameworks</h4>
-                      <p className="text-gray-300 text-sm">
+                      <h4 className="font-semibold text-dark-900 dark:text-white mb-1">Leverage Modern Frameworks</h4>
+                      <p className="text-dark-700 dark:text-gray-300 text-sm">
                         {analyticsData.technologyTrends.frameworks[0]?.name} leads with {analyticsData.technologyTrends.frameworks[0]?.percentage}% adoption. 
                         Consider building on established, well-supported frameworks.
                       </p>
@@ -408,8 +408,8 @@ const Analytics = () => {
                       <span className="text-green-400 font-bold">3</span>
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white mb-1">Address Market Gaps</h4>
-                      <p className="text-gray-300 text-sm">
+                      <h4 className="font-semibold text-dark-900 dark:text-white mb-1">Address Market Gaps</h4>
+                      <p className="text-dark-700 dark:text-gray-300 text-sm">
                         {analyticsData.marketInsights.gaps.length} identified market gaps present opportunities 
                         for innovative solutions that combine multiple technologies.
                       </p>

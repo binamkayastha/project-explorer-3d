@@ -134,21 +134,21 @@ const ProjectExplorer = () => {
           <div className="glass-card p-8 mb-8">
             <div className="flex items-center space-x-2 mb-6">
               <Lightbulb className="w-6 h-6 text-primary-400" />
-              <h2 className="text-2xl font-bold text-white">Describe Your Idea</h2>
+              <h2 className="text-2xl font-bold text-dark-900 dark:text-white">Describe Your Idea</h2>
             </div>
             
             <div className="space-y-4">
               {/* RAG Toggle */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-gray-400">Search Method:</span>
+                  <span className="text-sm text-dark-600 dark:text-gray-400">Search Method:</span>
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setUseRAGSearch(true)}
                       className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                         useRAGSearch
                           ? 'bg-primary-500 text-white'
-                          : 'bg-white/10 text-gray-400 hover:text-white'
+                          : 'bg-dark-700 text-gray-200 hover:text-white'
                       }`}
                     >
                       🧠 RAG Search
@@ -158,7 +158,7 @@ const ProjectExplorer = () => {
                       className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                         !useRAGSearch
                           ? 'bg-primary-500 text-white'
-                          : 'bg-white/10 text-gray-400 hover:text-white'
+                          : 'bg-dark-700 text-gray-200 hover:text-white'
                       }`}
                     >
                       🔍 Traditional
@@ -178,7 +178,7 @@ const ProjectExplorer = () => {
                 value={userIdea}
                 onChange={(e) => setUserIdea(e.target.value)}
                 placeholder="e.g., I want to build a CRM tool for real estate agents with AI-powered lead scoring and automated follow-ups..."
-                className="w-full p-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
+                className="w-full p-4 bg-dark-800 border border-dark-500 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
                 rows={4}
               />
               
@@ -215,19 +215,19 @@ const ProjectExplorer = () => {
               >
                 <div className="flex items-center space-x-2 mb-6">
                   <Target className="w-6 h-6 text-primary-400" />
-                  <h2 className="text-2xl font-bold text-white">Idea Analysis</h2>
+                  <h2 className="text-2xl font-bold text-dark-900 dark:text-white">Idea Analysis</h2>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Category */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-400">Category</h3>
-                    <p className="text-lg font-semibold text-white">{ideaAnalysis.category}</p>
+                    <h3 className="text-sm font-medium text-dark-600 dark:text-gray-400">Category</h3>
+                    <p className="text-lg font-semibold text-dark-900 dark:text-white">{ideaAnalysis.category}</p>
                   </div>
 
                   {/* Complexity */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-400">Complexity</h3>
+                    <h3 className="text-sm font-medium text-dark-600 dark:text-gray-400">Complexity</h3>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getComplexityColor(ideaAnalysis.complexity)}`}>
                       {ideaAnalysis.complexity.charAt(0).toUpperCase() + ideaAnalysis.complexity.slice(1)}
                     </span>
@@ -235,16 +235,16 @@ const ProjectExplorer = () => {
 
                   {/* Estimated Time */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-400">Estimated Time</h3>
+                    <h3 className="text-sm font-medium text-dark-600 dark:text-gray-400">Estimated Time</h3>
                     <div className="flex items-center space-x-2">
-                      <Clock className="w-4 h-4 text-gray-400" />
-                      <span className="text-lg font-semibold text-white">{ideaAnalysis.estimatedTime}</span>
+                      <Clock className="w-4 h-4 text-dark-500 dark:text-gray-400" />
+                      <span className="text-lg font-semibold text-dark-900 dark:text-white">{ideaAnalysis.estimatedTime}</span>
                     </div>
                   </div>
 
                   {/* Technologies */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-400">Technologies</h3>
+                    <h3 className="text-sm font-medium text-dark-600 dark:text-gray-400">Technologies</h3>
                     <div className="flex flex-wrap gap-2">
                       {ideaAnalysis.technologies.map((tech, index) => (
                         <span
@@ -259,7 +259,7 @@ const ProjectExplorer = () => {
 
                   {/* Features */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-400">Features</h3>
+                    <h3 className="text-sm font-medium text-dark-600 dark:text-gray-400">Features</h3>
                     <div className="flex flex-wrap gap-2">
                       {ideaAnalysis.features.map((feature, index) => (
                         <span
@@ -274,7 +274,7 @@ const ProjectExplorer = () => {
 
                   {/* Key Components */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-medium text-gray-400">Key Components</h3>
+                    <h3 className="text-sm font-medium text-dark-600 dark:text-gray-400">Key Components</h3>
                     <div className="flex flex-wrap gap-2">
                       {ideaAnalysis.keyComponents.map((component, index) => (
                         <span
@@ -355,8 +355,8 @@ const ProjectExplorer = () => {
                               <span className="text-white font-bold text-sm">{match.similarityScore}%</span>
                             </div>
                             <div>
-                              <h3 className="text-lg font-bold text-white">{match.project.name}</h3>
-                              <p className="text-sm text-gray-400">Match Score</p>
+                              <h3 className="text-lg font-bold text-dark-900 dark:text-white">{match.project.name}</h3>
+                              <p className="text-sm text-dark-600 dark:text-gray-400">Match Score</p>
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -369,18 +369,18 @@ const ProjectExplorer = () => {
                         </div>
 
                         {/* Project Description */}
-                        <p className="text-gray-300 text-sm mb-4 line-clamp-2">
+                        <p className="text-dark-700 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                           {match.project.description}
                         </p>
 
                         {/* Match Reason */}
                         <div className="mb-4">
-                          <h4 className="text-sm font-medium text-gray-400 mb-2">Why this matches:</h4>
-                          <p className="text-sm text-gray-300">{match.matchReason}</p>
+                          <h4 className="text-sm font-medium text-dark-600 dark:text-gray-400 mb-2">Why this matches:</h4>
+                          <p className="text-sm text-dark-700 dark:text-gray-300">{match.matchReason}</p>
                         </div>
 
                         {/* Project Stats */}
-                        <div className="flex items-center space-x-4 text-sm text-gray-400">
+                        <div className="flex items-center space-x-4 text-sm text-dark-600 dark:text-gray-400">
                           {match.project.github_stars > 0 && (
                             <div className="flex items-center space-x-1">
                               <Star className="w-4 h-4 fill-current text-sundai-400" />
@@ -396,7 +396,7 @@ const ProjectExplorer = () => {
                         </div>
 
                         {/* Action Buttons */}
-                        <div className="flex items-center space-x-2 mt-4 pt-4 border-t border-white/20">
+                        <div className="flex items-center space-x-2 mt-4 pt-4 border-t border-dark-100 dark:border-white/20">
                           <button
                             onClick={(e) => {
                               e.stopPropagation()
@@ -412,7 +412,7 @@ const ProjectExplorer = () => {
                               e.stopPropagation()
                               copyToClipboard(match.project.github_url || match.project.project_url)
                             }}
-                            className="flex items-center space-x-1 text-gray-400 hover:text-gray-300 transition-colors"
+                            className="flex items-center space-x-1 text-dark-600 hover:text-dark-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
                           >
                             <Copy className="w-4 h-4" />
                             <span className="text-sm">Copy URL</span>
@@ -451,11 +451,11 @@ const ProjectExplorer = () => {
 
                       {/* 3D Visualization Info */}
                       <div className="glass-card p-6">
-                        <h3 className="text-lg font-bold text-white mb-4">How to Use the 3D Visualization</h3>
+                        <h3 className="text-lg font-bold text-dark-900 dark:text-white mb-4">How to Use the 3D Visualization</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
-                            <h4 className="font-semibold text-white mb-2">Interactive Controls</h4>
-                            <ul className="space-y-2 text-sm text-gray-300">
+                            <h4 className="font-semibold text-dark-900 dark:text-white mb-2">Interactive Controls</h4>
+                            <ul className="space-y-2 text-sm text-dark-700 dark:text-gray-300">
                               <li>• <strong>Drag:</strong> Rotate the view around your idea</li>
                               <li>• <strong>Scroll:</strong> Zoom in and out</li>
                               <li>• <strong>Click nodes:</strong> View project details</li>
@@ -463,8 +463,8 @@ const ProjectExplorer = () => {
                             </ul>
                           </div>
                           <div>
-                            <h4 className="font-semibold text-white mb-2">Visual Elements</h4>
-                            <ul className="space-y-2 text-sm text-gray-300">
+                            <h4 className="font-semibold text-dark-900 dark:text-white mb-2">Visual Elements</h4>
+                            <ul className="space-y-2 text-sm text-dark-700 dark:text-gray-300">
                               <li>• <strong>💡 Blue Node:</strong> Your idea (center)</li>
                               <li>• <strong>🔗 Colored Nodes:</strong> Project matches</li>
                               <li>• <strong>🚀 Green Nodes:</strong> AI suggestions</li>
@@ -477,8 +477,8 @@ const ProjectExplorer = () => {
                   ) : (
                     <div className="glass-card p-8 text-center">
                       <Box className="w-16 h-16 text-primary-400 mx-auto mb-4" />
-                      <h3 className="text-xl font-bold text-white mb-2">No Data to Visualize</h3>
-                      <p className="text-gray-300 mb-4">
+                      <h3 className="text-xl font-bold text-dark-900 dark:text-white mb-2">No Data to Visualize</h3>
+                      <p className="text-dark-700 dark:text-gray-300 mb-4">
                         Analyze your idea first to see the interactive 3D visualization of your project ecosystem.
                       </p>
                       <button
@@ -516,24 +516,24 @@ const ProjectExplorer = () => {
                         {/* Combination Header */}
                         <div className="flex items-center justify-between mb-6">
                           <div>
-                            <h3 className="text-xl font-bold text-white mb-2">
+                            <h3 className="text-xl font-bold text-dark-900 dark:text-white mb-2">
                               {combination.primaryProject.name} + {combination.complementaryProjects[0].name}
                             </h3>
-                            <p className="text-gray-400">
+                            <p className="text-dark-600 dark:text-gray-300">
                               Build your solution by combining these complementary projects
                             </p>
                           </div>
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-primary-400">{combination.totalScore.toFixed(0)}</div>
-                            <div className="text-sm text-gray-400">Combination Score</div>
+                            <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">{combination.totalScore.toFixed(0)}</div>
+                            <div className="text-sm text-dark-600 dark:text-gray-300">Combination Score</div>
                           </div>
                         </div>
 
                         {/* Projects Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                           {/* Primary Project */}
-                          <div className="p-4 bg-white/5 rounded-lg">
-                            <h4 className="font-semibold text-white mb-2">Primary Project</h4>
+                          <div className="p-4 bg-dark-50 dark:bg-dark-700 rounded-lg">
+                            <h4 className="font-semibold text-dark-900 dark:text-white mb-2">Primary Project</h4>
                             <ProjectCard
                               project={combination.primaryProject}
                               onClick={() => handleProjectClick(combination.primaryProject)}
@@ -542,8 +542,8 @@ const ProjectExplorer = () => {
                           </div>
 
                           {/* Complementary Project */}
-                          <div className="p-4 bg-white/5 rounded-lg">
-                            <h4 className="font-semibold text-white mb-2">Complementary Project</h4>
+                          <div className="p-4 bg-dark-50 dark:bg-dark-700 rounded-lg">
+                            <h4 className="font-semibold text-dark-900 dark:text-white mb-2">Complementary Project</h4>
                             <ProjectCard
                               project={combination.complementaryProjects[0]}
                               onClick={() => handleProjectClick(combination.complementaryProjects[0])}
@@ -556,13 +556,13 @@ const ProjectExplorer = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Integration Steps */}
                           <div>
-                            <h4 className="font-semibold text-white mb-3 flex items-center space-x-2">
+                            <h4 className="font-semibold text-dark-900 dark:text-white mb-3 flex items-center space-x-2">
                               <TrendingUp className="w-4 h-4 text-primary-400" />
                               <span>Integration Steps</span>
                             </h4>
                             <ol className="space-y-2">
                               {combination.integrationSteps.map((step, stepIndex) => (
-                                <li key={stepIndex} className="flex items-start space-x-2 text-sm text-gray-300">
+                                <li key={stepIndex} className="flex items-start space-x-2 text-sm text-dark-700 dark:text-gray-300">
                                   <span className="w-5 h-5 rounded-full bg-primary-500 text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
                                     {stepIndex + 1}
                                   </span>
@@ -576,16 +576,16 @@ const ProjectExplorer = () => {
                           <div className="space-y-4">
                             {/* Development Time */}
                             <div>
-                              <h4 className="font-semibold text-white mb-2 flex items-center space-x-2">
+                              <h4 className="font-semibold text-dark-900 dark:text-white mb-2 flex items-center space-x-2">
                                 <Clock className="w-4 h-4 text-primary-400" />
                                 <span>Development Time</span>
                               </h4>
-                              <p className="text-gray-300">{combination.estimatedDevelopmentTime}</p>
+                              <p className="text-dark-700 dark:text-gray-300">{combination.estimatedDevelopmentTime}</p>
                             </div>
 
                             {/* Missing Components */}
                             <div>
-                              <h4 className="font-semibold text-white mb-2 flex items-center space-x-2">
+                              <h4 className="font-semibold text-dark-900 dark:text-white mb-2 flex items-center space-x-2">
                                 <Code className="w-4 h-4 text-primary-400" />
                                 <span>Missing Components</span>
                               </h4>

@@ -85,11 +85,12 @@ const ProjectModal = ({ project, onClose, isOpen }: ProjectModalProps) => {
                    {project.description}
                  </p>
               </div>
-                             <button
+                <button
                  onClick={onClose}
-                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                 className="p-2 rounded-full bg-dark-700 text-white hover:bg-dark-600 transition-colors"
+                 aria-label="Close project details"
                >
-                 <X className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                 <X className="w-6 h-6" />
                </button>
             </div>
 

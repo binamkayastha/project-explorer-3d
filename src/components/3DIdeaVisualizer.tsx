@@ -172,13 +172,13 @@ const ThreeDIdeaVisualizer = ({
       <div className="absolute bottom-4 left-4 flex space-x-2">
         <button
           onClick={() => setRotation(prev => ({ ...prev, y: prev.y - 45 }))}
-          className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+          className="p-2 rounded-lg bg-dark-700 text-white hover:bg-dark-600 transition-colors"
         >
           <Sparkles className="w-4 h-4 text-white" />
         </button>
         <button
           onClick={() => setRotation(prev => ({ ...prev, y: prev.y + 45 }))}
-          className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+          className="p-2 rounded-lg bg-dark-700 text-white hover:bg-dark-600 transition-colors"
         >
           <Star className="w-4 h-4 text-white" />
         </button>
